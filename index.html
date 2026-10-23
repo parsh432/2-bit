@@ -1,0 +1,3331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PROJECT DEFUSE 3D // ZERO HOUR ORDNANCE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700;800&family=Special+Elite&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --bg-header: #0d121c;
+      --border-panel: #222d42;
+      --border-highlight: #38bdf8;
+      --hazard-yellow: #f59e0b;
+      --hazard-black: #111827;
+      
+      --led-red-off: #3b0d0d;
+      --led-red-on: #ef4444;
+      --led-red-glow: rgba(239, 68, 68, 0.9);
+      
+      --led-green-off: #0b3318;
+      --led-green-on: #10b981;
+      --led-green-glow: rgba(16, 185, 129, 0.9);
+
+      --font-display: 'Orbitron', monospace, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      --font-ui: 'Rajdhani', sans-serif;
+      --font-dossier: 'Special Elite', cursive;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: #e2e8f0;
+      font-family: var(--font-ui);
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* TOP COMMAND HEADER */
+    .top-bar {
+      background: var(--bg-header);
+      border-bottom: 2px solid var(--border-panel);
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      z-index: 100;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      font-size: 24px;
+      color: var(--hazard-yellow);
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.8; transform: scale(1); filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.6)); }
+      50% { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 12px rgba(245, 158, 11, 1)); }
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #f8fafc;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: #94a3b8;
+      letter-spacing: 1px;
+    }
+
+    .header-center-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Background Music Player Bar */
+    .music-player-bar {
+      background: #131b2a;
+      border: 1px solid #29384f;
+      border-radius: 6px;
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .music-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      max-width: 220px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .music-btn {
+      background: #1e293b;
+      border: 1px solid #475569;
+      color: #f8fafc;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .music-btn:hover {
+      background: #334155;
+      color: #38bdf8;
+    }
+
+    .music-volume-slider {
+      width: 60px;
+      accent-color: #38bdf8;
+      cursor: pointer;
+    }
+
+    /* View & Tactical Buttons */
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-tactical {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 5px 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-tactical:hover {
+      background: #334155;
+      color: #f8fafc;
+      border-color: #475569;
+    }
+
+    .btn-tactical.active {
+      background: #0284c7;
+      color: #fff;
+      border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-hazard {
+      background: #dc2626;
+      color: #fff;
+      border-color: #ef4444;
+    }
+    .btn-hazard:hover {
+      background: #b91c1c;
+    }
+
+    .btn-success {
+      background: #16a34a;
+      color: #fff;
+      border-color: #22c55e;
+    }
+    .btn-success:hover {
+      background: #15803d;
+    }
+
+    /* MAIN STAGE LAYOUT (3D Canvas + Split Manual) */
+    .app-layout {
+      flex: 1;
+      display: flex;
+      width: 100%;
+      height: calc(100vh - 54px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 3D WebGL Viewport */
+    .viewport-3d-stage {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      background: radial-gradient(circle at 50% 40%, #151d2c 0%, #07090e 80%);
+      overflow: hidden;
+      cursor: grab;
+    }
+
+    .viewport-3d-stage:active {
+      cursor: grabbing;
+    }
+
+    #webgl-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Manual Stage (Embedded Dossier) */
+    .manual-stage {
+      width: 50%;
+      height: 100%;
+      background: #f5f2eb;
+      color: #1c1917;
+      border-left: 3px solid #232d3f;
+      display: none;
+      box-shadow: -10px 0 35px rgba(0,0,0,0.6);
+      z-index: 10;
+    }
+
+    /* Manual Slide-out Drawer (Opens ONLY when selected) */
+    .manual-drawer {
+      position: fixed;
+      top: 54px;
+      right: -620px;
+      width: 580px;
+      max-width: 95vw;
+      height: calc(100vh - 54px);
+      background: #f8fafc;
+      border-left: 3px solid #334155;
+      box-shadow: -15px 0 45px rgba(0,0,0,0.85);
+      transition: right 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .manual-drawer.open {
+      right: 0;
+    }
+
+    .manual-drawer-header {
+      background: #0f172a;
+      color: #fff;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #334155;
+      flex-shrink: 0;
+    }
+
+    .level-pill.locked {
+      opacity: 0.42;
+      cursor: not-allowed;
+      border-color: #1e293b;
+      color: #64748b;
+    }
+
+    /* 3D HUD OVERLAY */
+    .hud-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 14px 18px;
+    }
+
+    .hud-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: auto;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hud-card {
+      background: rgba(13, 18, 28, 0.88);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      backdrop-filter: blur(8px);
+      border-radius: 6px;
+      padding: 8px 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+
+    .hud-level-title {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .level-pills {
+      display: flex;
+      gap: 5px;
+    }
+
+    .level-pill {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 3px 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .level-pill:hover {
+      background: #334155;
+      color: #f8fafc;
+    }
+
+    .level-pill.current {
+      background: #ea580c;
+      color: #fff;
+      border-color: #f97316;
+      box-shadow: 0 0 10px rgba(249, 115, 22, 0.6);
+    }
+
+    .level-pill.cleared {
+      border-color: #10b981;
+      color: #10b981;
+    }
+
+    /* Central Digital Countdown Timer & 3 Strikes Display */
+    .hud-timer-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(5, 7, 10, 0.92);
+      border: 2px solid #2a3449;
+      border-radius: 8px;
+      padding: 8px 18px;
+      box-shadow: inset 0 0 16px rgba(0,0,0,0.9), 0 8px 24px rgba(0,0,0,0.6);
+    }
+
+    .timer-container {
+      text-align: center;
+    }
+
+    .timer-label {
+      font-size: 9px;
+      font-family: var(--font-mono);
+      color: #64748b;
+      letter-spacing: 2px;
+      margin-bottom: 2px;
+    }
+
+    .timer-digits {
+      font-family: var(--font-display);
+      font-size: 34px;
+      font-weight: 900;
+      color: #ef4444;
+      text-shadow: 0 0 14px rgba(239, 68, 68, 0.85);
+      letter-spacing: 3px;
+      line-height: 1;
+    }
+
+    .timer-digits.warning {
+      color: #f59e0b;
+      text-shadow: 0 0 14px rgba(245, 158, 11, 0.85);
+    }
+
+    .timer-digits.critical {
+      color: #dc2626;
+      animation: timerFlash 0.5s infinite alternate;
+    }
+
+    @keyframes timerFlash {
+      from { opacity: 1; text-shadow: 0 0 24px rgba(220, 38, 38, 1); }
+      to { opacity: 0.35; text-shadow: 0 0 4px rgba(220, 38, 38, 0.3); }
+    }
+
+    /* 3 Strike Indicators */
+    .strikes-container {
+      border-left: 2px solid #1e293b;
+      padding-left: 14px;
+      text-align: center;
+    }
+
+    .strikes-label {
+      font-size: 9px;
+      font-family: var(--font-mono);
+      color: #64748b;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    .strikes-leds {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .strike-led {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--led-red-off);
+      border: 2px solid #551111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+      transition: all 0.2s ease;
+    }
+
+    .strike-led.active {
+      background: var(--led-red-on);
+      border-color: #ff8888;
+      color: #fff;
+      box-shadow: 0 0 16px var(--led-red-glow), inset 0 1px 2px #fff;
+      animation: strikePulse 0.4s ease-in-out;
+    }
+
+    @keyframes strikePulse {
+      0% { transform: scale(1.4); }
+      50% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+
+    /* Camera Preset Controls */
+    .hud-bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: auto;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .camera-presets-bar {
+      display: flex;
+      gap: 6px;
+      background: rgba(13, 18, 28, 0.88);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      backdrop-filter: blur(8px);
+      border-radius: 6px;
+      padding: 6px 10px;
+    }
+
+    .hud-interactive-hint {
+      background: rgba(13, 18, 28, 0.88);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      backdrop-filter: blur(8px);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #f59e0b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hover-tooltip {
+      position: absolute;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid #38bdf8;
+      color: #f8fafc;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      pointer-events: none;
+      transform: translate(-50%, -130%);
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+      display: none;
+      z-index: 50;
+    }
+
+    /* START SCREEN OVERLAY */
+    .start-screen-overlay {
+      position: fixed;
+      top: 54px;
+      left: 0;
+      width: 100vw;
+      height: calc(100vh - 54px);
+      background: rgba(7, 9, 14, 0.45);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: 800;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: opacity 0.3s ease;
+    }
+
+    .start-card {
+      max-width: 620px;
+      width: 100%;
+      background: rgba(13, 18, 28, 0.95);
+      border: 2px solid #38bdf8;
+      border-radius: 12px;
+      padding: 36px 30px;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(56, 189, 248, 0.25), inset 0 0 30px rgba(0,0,0,0.8);
+      position: relative;
+    }
+
+    .start-hazard-tape {
+      height: 10px;
+      width: 100%;
+      background: repeating-linear-gradient(
+        -45deg,
+        #f59e0b,
+        #f59e0b 14px,
+        #111827 14px,
+        #111827 28px
+      );
+      margin-bottom: 24px;
+      border-radius: 2px;
+    }
+
+    .start-title {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 900;
+      color: #f8fafc;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+      text-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+    }
+
+    .start-sub {
+      font-size: 15px;
+      color: #94a3b8;
+      letter-spacing: 1px;
+      margin-bottom: 28px;
+    }
+
+    .start-btn {
+      background: #dc2626;
+      color: #fff;
+      border: 2px solid #ef4444;
+      padding: 16px 38px;
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .start-btn:hover {
+      background: #b91c1c;
+      transform: scale(1.05);
+      box-shadow: 0 0 35px rgba(239, 68, 68, 0.9);
+    }
+
+    /* SUBPLOT DIALOGUE SCREEN */
+    .subplot-overlay {
+      position: fixed;
+      top: 54px;
+      left: 0;
+      width: 100vw;
+      height: calc(100vh - 54px);
+      background: rgba(5, 7, 12, 0.45);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: 750;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: opacity 0.3s ease;
+    }
+
+    .comms-window {
+      max-width: 720px;
+      width: 100%;
+      background: #0d131f;
+      border: 2px solid #22c55e;
+      border-radius: 10px;
+      box-shadow: 0 0 40px rgba(34, 197, 94, 0.25);
+      overflow: hidden;
+      animation: modalSlide 0.3s ease-out;
+    }
+
+    .comms-header {
+      background: #111a28;
+      border-bottom: 2px solid #22c55e;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #22c55e;
+      font-weight: 700;
+    }
+
+    .comms-body {
+      display: flex;
+      gap: 20px;
+      padding: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .character-portrait-box {
+      width: 130px;
+      height: 130px;
+      background: #1e293b;
+      border: 2px solid #22c55e;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .character-portrait-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+    }
+
+    .comms-text-area {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .comms-sender-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 900;
+      color: #38bdf8;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .comms-dialogue-bubble {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.6;
+      color: #f8fafc;
+      min-height: 80px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .comms-footer {
+      background: #111a28;
+      border-top: 1px solid #1e293b;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* CRT Scanlines */
+    .crt-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+      z-index: 999;
+      display: none;
+    }
+
+    /* Explosion Screen Flash & Shake */
+    .screen-shake {
+      animation: heavyShake 0.9s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    @keyframes heavyShake {
+      10%, 90% { transform: translate3d(-6px, 3px, 0); }
+      20%, 80% { transform: translate3d(8px, -5px, 0); }
+      30%, 50%, 70% { transform: translate3d(-10px, 8px, 0); }
+      40%, 60% { transform: translate3d(10px, -8px, 0); }
+    }
+
+    .explosion-flash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #fff;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.05s ease;
+    }
+
+    .explosion-flash.active {
+      opacity: 1;
+      animation: explodeFade 2s forwards;
+    }
+
+    @keyframes explodeFade {
+      0% { opacity: 1; background: #fff; }
+      20% { opacity: 0.95; background: #ef4444; }
+      60% { opacity: 0.7; background: #1c1917; }
+      100% { opacity: 0; }
+    }
+
+    /* MODALS */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(6px);
+      z-index: 600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-box {
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 10px;
+      max-width: 540px;
+      width: 100%;
+      padding: 30px 26px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.95);
+      animation: modalSlide 0.3s ease-out;
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+
+    .modal-title.victory {
+      color: #10b981;
+      text-shadow: 0 0 16px var(--led-green-glow);
+    }
+
+    .modal-title.defeat {
+      color: #ef4444;
+      text-shadow: 0 0 16px var(--led-red-glow);
+    }
+
+    .modal-desc {
+      font-size: 15px;
+      color: #cbd5e1;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .stats-table {
+      width: 100%;
+      background: #1e293b;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 24px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .stats-table div {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid #334155;
+    }
+
+    .stats-table div:last-child {
+      border-bottom: none;
+    }
+
+    @media (max-width: 900px) {
+      .app-layout {
+        flex-direction: column;
+      }
+      .layout-split .viewport-3d-stage,
+      .layout-split .manual-stage {
+        width: 100%;
+        max-width: 100%;
+        height: 50%;
+      }
+      .hud-timer-box {
+        padding: 6px 12px;
+      }
+      .timer-digits {
+        font-size: 26px;
+      }
+      .music-title {
+        max-width: 130px;
+      }
+    }
+  </style>
+
+  <!-- Load Local Three.js and OrbitControls -->
+  <script src="three.min.js"></script>
+  <script src="OrbitControls.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+      document.head.appendChild(s);
+    }
+  </script>
+</head>
+<body>
+
+<!-- AUDIO ELEMENT FOR SUNO SOUNDTRACK -->
+<audio id="bg-soundtrack" loop preload="auto">
+  <source src="soundtrack.mp4" type="audio/mp4">
+  <source src="soundtrack.m4a" type="audio/mp4">
+  <source src="https://cdn1.suno.ai/d68af5a2-24b3-4a0f-afe1-41ce6f8d2dac.mp4" type="audio/mp4">
+</audio>
+
+<div class="explosion-flash" id="explosion-flash"></div>
+<div class="hover-tooltip" id="hover-tooltip"></div>
+
+<!-- 1. START SCREEN OVERLAY -->
+<div class="start-screen-overlay" id="screen-start">
+  <div class="start-card">
+    <div class="start-hazard-tape"></div>
+    <div style="font-size: 42px; margin-bottom: 6px;">☢</div>
+    <h1 class="start-title">OPERATION DEFUSE</h1>
+    <div class="start-sub">VOLATILE ORDNANCE INTERCEPT MATRIX // ZERO HOUR</div>
+    <p style="color: #cbd5e1; font-size: 15px; line-height: 1.6; margin-bottom: 24px;">
+      A brutal war has engulfed the district. Volatile enemy ordnances have been planted across critical power sectors. The 3D ordnance is right in front of you. Disarm it before detonation!
+    </p>
+    <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+      <button class="start-btn" style="background:#16a34a; border-color:#22c55e; box-shadow:0 0 25px rgba(34,197,94,0.6);" onclick="skipBriefing()">
+        <span>💣</span> DISARM BOMB NOW (PLAY)
+      </button>
+      <button class="start-btn" style="background:#0284c7; border-color:#38bdf8; box-shadow:0 0 25px rgba(56,189,248,0.5);" onclick="startOperationClick()">
+        <span>📜</span> SGT. VANCE BRIEFING
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 2. SUBPLOT BRIEFING DIALOGUE SCREEN (SGT. VANCE) -->
+<div class="subplot-overlay" id="screen-subplot">
+  <div class="comms-window">
+    <div class="comms-header">
+      <span>● SATELLITE COMMS // SECURE LINK 99.8%</span>
+      <span style="color:#f59e0b;">PRIORITY: ALPHA-ONE</span>
+    </div>
+    <div class="comms-body">
+      <div class="character-portrait-box">
+        <img src="character.png" alt="Sgt. Vance">
+      </div>
+      <div class="comms-text-area">
+        <div class="comms-sender-title">SGT. VANCE // COMBAT EOD COMMAND</div>
+        <div class="comms-dialogue-bubble" id="comms-dialogue-text">
+          <!-- Populated by typewriter script -->
+        </div>
+      </div>
+    </div>
+    <div class="comms-footer">
+      <button class="btn-tactical btn-hazard" onclick="skipBriefing()">⏩ DEFUSE BOMB NOW [SKIP]</button>
+      <button class="btn-tactical btn-success" id="btn-next-dialogue" onclick="advanceDialogue()">NEXT DIALOGUE ▶</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOP COMMAND BAR -->
+<header class="top-bar">
+  <div class="brand">
+    <div class="brand-icon">☢</div>
+    <div>
+      <div class="brand-title">DEFUSE PROTOCOL 3D</div>
+      <div class="brand-subtitle">TACTICAL VOLATILE ORDNANCE INTERCEPT</div>
+    </div>
+  </div>
+
+  <div class="header-center-controls">
+    <!-- Suno Song Background Player (Comfortable preset volume) -->
+    <div class="music-player-bar">
+      <button class="music-btn" id="btn-music-toggle" onclick="toggleMusic()">▶ PLAY MUSIC</button>
+      <div class="music-title" title="Suno Track: https://suno.com/s/0IU8jSjlQgjomEid">
+        <span>♫</span> Suno: Zero Hour Defusal
+      </div>
+      <button class="music-btn" onclick="window.open('https://suno.com/s/0IU8jSjlQgjomEid', '_blank')" title="Open Suno Track in new tab">↗</button>
+    </div>
+  </div>
+
+  <div class="top-controls">
+    <!-- Field Manual Drawer & Restart (Unnecessary split co-op, pop-out, sfx, crt removed) -->
+    <button class="btn-tactical" id="btn-manual-toggle" onclick="toggleManualDrawer()">📖 FIELD MANUAL</button>
+    <button class="btn-tactical btn-hazard" onclick="restartCurrentLevel()">↻ Restart Level</button>
+  </div>
+</header>
+
+<main class="app-layout" id="main-layout">
+  <!-- 3D VIEWPORT CONTAINER -->
+  <section class="viewport-3d-stage" id="viewport-stage">
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- 3D HUD OVERLAY -->
+    <div class="hud-overlay">
+      <!-- Top HUD Row -->
+      <div class="hud-top-row">
+        <!-- Level Info & Selector -->
+        <div class="hud-card">
+          <div class="hud-level-title" id="hud-level-title">
+            LEVEL 1: OPERATION FIRST CONTACT [★☆☆☆☆]
+          </div>
+          <div class="level-pills">
+            <button class="level-pill current" id="pill-lvl-1" onclick="selectLevel(1)">LVL 1</button>
+            <button class="level-pill" id="pill-lvl-2" onclick="selectLevel(2)">LVL 2</button>
+            <button class="level-pill" id="pill-lvl-3" onclick="selectLevel(3)">LVL 3</button>
+            <button class="level-pill" id="pill-lvl-4" onclick="selectLevel(4)">LVL 4</button>
+            <button class="level-pill" id="pill-lvl-5" onclick="selectLevel(5)">LVL 5</button>
+          </div>
+        </div>
+
+        <!-- 3D Bomb Timer & Strikes Display -->
+        <div class="hud-timer-box">
+          <div class="timer-container">
+            <div class="timer-label">DETONATION COUNTDOWN</div>
+            <div class="timer-digits" id="timer-display">04:00.0</div>
+          </div>
+          <div class="strikes-container">
+            <div class="strikes-label">CRITICAL FAILURES (3 = BOOM)</div>
+            <div class="strikes-leds">
+              <div class="strike-led" id="strike-1">X</div>
+              <div class="strike-led" id="strike-2">X</div>
+              <div class="strike-led" id="strike-3">X</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom HUD Row -->
+      <div class="hud-bottom-row">
+        <!-- Camera Preset Controls -->
+        <div class="camera-presets-bar">
+          <button class="btn-tactical" onclick="setCameraPreset('top')">🎥 Top Face</button>
+          <button class="btn-tactical" onclick="setCameraPreset('iso')">📐 3D Perspective</button>
+          <button class="btn-tactical" onclick="setCameraPreset('mod1')">🔍 Focus Mod 1</button>
+          <button class="btn-tactical" onclick="setCameraPreset('mod2')">🔍 Focus Mod 2</button>
+          <button class="btn-tactical" onclick="setCameraPreset('reset')">🔄 Reset Orbit</button>
+        </div>
+
+        <!-- Tactical Hint -->
+        <div class="hud-interactive-hint">
+          <span>🖐️</span> Click &amp; Drag to Orbit 3D Ordnance · Click 3D Wires / Buttons to Defuse
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLASSIFIED FIELD MANUAL DRAWER (SHOWN ONLY WHEN SELECTED) -->
+  <div class="manual-drawer" id="manual-drawer">
+    <div class="manual-drawer-header">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="color:#f59e0b; font-size:16px;">📖</span>
+        <span style="font-family:'Orbitron',monospace; font-size:12px; font-weight:800; letter-spacing:1px; color:#f8fafc;">CLASSIFIED EOD MANUAL</span>
+      </div>
+      <button class="btn-tactical btn-hazard" style="padding:4px 10px; font-size:11px;" onclick="toggleManualDrawer()">✕ CLOSE [ESC]</button>
+    </div>
+    <iframe id="manual-frame" src="manual.html?level=1" style="flex:1; width:100%; height:100%; border:none;" title="Field Manual"></iframe>
+  </div>
+</main>
+
+<!-- VICTORY MODAL (SPECIAL "SUCCESSFUL" FOR LEVEL 1) -->
+<div class="modal-backdrop" id="modal-victory">
+  <div class="modal-box">
+    <div class="modal-title victory" id="victory-title" style="font-size:32px; letter-spacing:3px;">SUCCESSFUL!</div>
+    <div class="modal-desc" id="victory-message">
+      Threat neutralized. All failsafe circuits have been decoupled without incident!
+    </div>
+    <div class="stats-table">
+      <div><span>Level Completed:</span><strong id="stat-level">Level 1</strong></div>
+      <div><span>Time Elapsed:</span><strong id="stat-time">00:45</strong></div>
+      <div><span>Strikes Incurred:</span><strong id="stat-strikes">0 / 3</strong></div>
+      <div><span>Threat Rating:</span><strong style="color:#10b981;">MISSION SUCCESSFUL</strong></div>
+    </div>
+    <button class="btn-tactical btn-success" style="padding:12px 28px; font-size:15px; font-weight:800;" id="btn-next-level" onclick="nextLevel()">CONTINUE TO NEXT LEVEL →</button>
+  </div>
+</div>
+
+<!-- DEFEAT / DETONATION MODAL -->
+<div class="modal-backdrop" id="modal-defeat">
+  <div class="modal-box">
+    <div class="modal-title defeat">BOMB DETONATED!</div>
+    <div class="modal-desc" id="defeat-message">
+      Anti-tamper failsafe triggered. The ordnance detonated. Review the field manual instructions carefully.
+    </div>
+    <div class="stats-table">
+      <div><span>Reason:</span><strong style="color:#ef4444;" id="defeat-reason">3 Strikes Incurred</strong></div>
+      <div><span>Level Reached:</span><strong id="defeat-level">Level 1</strong></div>
+      <div><span>Modules Defused:</span><strong id="defeat-modules">1 / 2</strong></div>
+    </div>
+    <button class="btn-tactical btn-hazard" style="padding:10px 24px; font-size:14px;" onclick="retryLevel()">RETRY OPERATION</button>
+  </div>
+</div>
+
+<!-- CAMPAIGN COMPLETE MODAL -->
+<div class="modal-backdrop" id="modal-campaign">
+  <div class="modal-box" style="max-width:600px;">
+    <div class="modal-title victory">★ CAMPAIGN MASTER DEFUSER ★</div>
+    <div class="modal-desc">
+      All 5 Threat Levels, from the Calibration Prototype to the Omega Doomsday Core, have been systematically and successfully disarmed! The war is won!
+    </div>
+    <div class="stats-table">
+      <div><span>Final EOD Certification:</span><strong style="color:#10b981;">MASTER 3D ORDNANCE TECH</strong></div>
+      <div><span>Total Levels Cleared:</span><strong>5 of 5</strong></div>
+      <div><span>Protocol Status:</span><strong>OPERATION COMPLETE</strong></div>
+    </div>
+    <button class="btn-tactical" style="padding:10px 24px; font-size:14px;" onclick="restartCampaign()">RESTART CAMPAIGN FROM LVL 1</button>
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   SOUND SYSTEM (Web Audio API Synthesizer - 100% Offline, Zero Assets)
+   ========================================================================== */
+class AudioEngine {
+  constructor() {
+    this.ctx = null;
+    this.muted = false;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  playTick(high = false) {
+    if (this.muted || !this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(high ? 1200 : 800, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + 0.03);
+    gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.03);
+  }
+
+  playSnip() {
+    if (this.muted || !this.ctx) return;
+    const bufferSize = this.ctx.sampleRate * 0.06;
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(2400, this.ctx.currentTime);
+    filter.Q.setValueAtTime(3, this.ctx.currentTime);
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.06);
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+    noise.start();
+  }
+
+  playClick() {
+    if (this.muted || !this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(500, this.ctx.currentTime);
+    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.04);
+  }
+
+  playBuzzer() {
+    if (this.muted || !this.ctx) return;
+    const osc1 = this.ctx.createOscillator();
+    const osc2 = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc1.type = 'sawtooth';
+    osc2.type = 'sawtooth';
+    osc1.frequency.setValueAtTime(110, this.ctx.currentTime);
+    osc2.frequency.setValueAtTime(116, this.ctx.currentTime);
+    gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc1.start();
+    osc2.start();
+    osc1.stop(this.ctx.currentTime + 0.4);
+    osc2.stop(this.ctx.currentTime + 0.4);
+  }
+
+  playTone(freq, duration = 0.25) {
+    if (this.muted || !this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+    gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(this.ctx.currentTime + duration);
+  }
+
+  playRadioBeep() {
+    if (this.muted || !this.ctx) return;
+    this.playTone(880, 0.08);
+  }
+
+  playDisarmedChime() {
+    if (this.muted || !this.ctx) return;
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, idx) => {
+      setTimeout(() => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.3);
+      }, idx * 60);
+    });
+  }
+
+  playFanfare() {
+    if (this.muted || !this.ctx) return;
+    const chord = [392, 523.25, 659.25, 783.99, 1046.50];
+    chord.forEach((freq, idx) => {
+      setTimeout(() => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.9);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.9);
+      }, idx * 90);
+    });
+  }
+
+  playHeartbeat() {
+    if (this.muted || !this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(55, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(35, this.ctx.currentTime + 0.12);
+    gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.12);
+  }
+
+  playExplosion() {
+    if (this.muted || !this.ctx) return;
+    const bufferSize = this.ctx.sampleRate * 2.0;
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(900, this.ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(35, this.ctx.currentTime + 2.0);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.9, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 2.0);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+    noise.start();
+
+    const subOsc = this.ctx.createOscillator();
+    const subGain = this.ctx.createGain();
+    subOsc.type = 'sawtooth';
+    subOsc.frequency.setValueAtTime(95, this.ctx.currentTime);
+    subOsc.frequency.exponentialRampToValueAtTime(20, this.ctx.currentTime + 2.0);
+    subGain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+    subGain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 2.0);
+    subOsc.connect(subGain);
+    subGain.connect(this.ctx.destination);
+    subOsc.start();
+    subOsc.stop(this.ctx.currentTime + 2.0);
+  }
+}
+
+const audio = new AudioEngine();
+document.addEventListener('click', () => { audio.init(); }, { once: true });
+
+/* ==========================================================================
+   SUNO BACKGROUND SOUNDTRACK (TRACK: https://suno.com/s/0IU8jSjlQgjomEid)
+   ========================================================================== */
+const musicAudio = document.getElementById('bg-soundtrack');
+let isMusicPlaying = false;
+
+function startSoundtrack() {
+  audio.init();
+  if (musicAudio) {
+    musicAudio.volume = 0.35;
+    musicAudio.play().then(() => {
+      isMusicPlaying = true;
+      const btn = document.getElementById('btn-music-toggle');
+      if (btn) btn.innerText = '⏸ PAUSE MUSIC';
+    }).catch(() => {});
+  }
+}
+
+function toggleMusic() {
+  audio.init();
+  if (!musicAudio) return;
+  if (isMusicPlaying) {
+    musicAudio.pause();
+    isMusicPlaying = false;
+    document.getElementById('btn-music-toggle').innerText = '▶ PLAY MUSIC';
+  } else {
+    musicAudio.volume = 0.35;
+    musicAudio.play().then(() => {
+      isMusicPlaying = true;
+      document.getElementById('btn-music-toggle').innerText = '⏸ PAUSE MUSIC';
+    }).catch(() => {});
+  }
+}
+
+/* ==========================================================================
+   SUBPLOT DIALOGUE & NATURAL ENGLISH VOICE (SGT. VANCE BRIEFING)
+   ========================================================================== */
+function speakDialogueVoice(text) {
+  if (!('speechSynthesis' in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = 1.0;
+    u.pitch = 0.94;
+    window.speechSynthesis.speak(u);
+  } catch (err) {}
+}
+
+const BRIEFING_DIALOGUES = [
+  "Specialist, do you read me? This is Sergeant Vance. A brutal war has erupted in our sector, and enemy infiltrators have planted high-yield bombs across our critical power grid!",
+  "HQ dispatched you because you are our sharpest bomb defusal expert. If these bombs detonate, our defensive line collapses and thousands will be lost. We need you to disarm them now.",
+  "Every wire, switch, and component follows standard military color codes from 0 to 9. Click the Field Manual button at any time if you need guidance. But stay sharp: three strikes and the bomb blows!",
+  "Level 1 is your initial operational trial: consult your Field Manual to decode wire configurations and keypad color frequencies. Stay focused, disarm that ordnance, and let's win this war!"
+];
+
+let currentDialogueIndex = 0;
+let typewriterInterval = null;
+
+function startOperationClick() {
+  audio.init();
+  audio.playClick();
+  document.getElementById('screen-start').style.display = 'none';
+  document.getElementById('screen-subplot').style.display = 'flex';
+  showDialogue(0);
+}
+
+function showDialogue(idx) {
+  currentDialogueIndex = idx;
+  const fullText = BRIEFING_DIALOGUES[idx];
+  const container = document.getElementById('comms-dialogue-text');
+  container.textContent = "";
+  clearInterval(typewriterInterval);
+
+  audio.playRadioBeep();
+  speakDialogueVoice(fullText);
+
+  let charIdx = 0;
+  typewriterInterval = setInterval(() => {
+    if (charIdx <= fullText.length) {
+      container.textContent = fullText.slice(0, charIdx);
+      charIdx++;
+    } else {
+      clearInterval(typewriterInterval);
+    }
+  }, 22);
+
+  const btnNext = document.getElementById('btn-next-dialogue');
+  if (idx === BRIEFING_DIALOGUES.length - 1) {
+    btnNext.innerText = "DEFUSE LEVEL 1 NOW ➔";
+  } else {
+    btnNext.innerText = "NEXT DIALOGUE ▶";
+  }
+}
+
+function advanceDialogue() {
+  audio.playClick();
+  const container = document.getElementById('comms-dialogue-text');
+  const fullText = BRIEFING_DIALOGUES[currentDialogueIndex];
+  if (container.textContent.length < fullText.length) {
+    clearInterval(typewriterInterval);
+    container.textContent = fullText;
+    return;
+  }
+  if (currentDialogueIndex < BRIEFING_DIALOGUES.length - 1) {
+    showDialogue(currentDialogueIndex + 1);
+  } else {
+    skipBriefing();
+  }
+}
+
+function skipBriefing() {
+  audio.playClick();
+  clearInterval(typewriterInterval);
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  document.getElementById('screen-subplot').style.display = 'none';
+  startSoundtrack();
+  initLevel(0);
+  setTimeout(onWindowResize, 50);
+}
+
+/* ==========================================================================
+   COLOR CODES & 5-LEVEL PROGRESSION (EASIER LEVEL 1 & GRADUAL INCREASE)
+   ========================================================================== */
+const COLOR_MAP = {
+  black:  { name: 'Black',  val: 0, hex: 0x1c1917, str: '#1c1917' },
+  brown:  { name: 'Brown',  val: 1, hex: 0x854d0e, str: '#854d0e' },
+  red:    { name: 'Red',    val: 2, hex: 0xef4444, str: '#ef4444' },
+  orange: { name: 'Orange', val: 3, hex: 0xf97316, str: '#f97316' },
+  yellow: { name: 'Yellow', val: 4, hex: 0xeab308, str: '#eab308' },
+  green:  { name: 'Green',  val: 5, hex: 0x22c55e, str: '#22c55e' },
+  blue:   { name: 'Blue',   val: 6, hex: 0x3b82f6, str: '#3b82f6' },
+  violet: { name: 'Violet', val: 7, hex: 0xa855f7, str: '#a855f7' },
+  grey:   { name: 'Grey',   val: 8, hex: 0x94a3b8, str: '#94a3b8' },
+  white:  { name: 'White',  val: 9, hex: 0xf8fafc, str: '#f8fafc' }
+};
+
+const LEVELS = [
+  {
+    level: 1,
+    title: "OPERATION FIRST CONTACT (RECRUIT)",
+    difficulty: "★☆☆☆☆",
+    timeLimit: 240,
+    serial: "BD-4819-B",
+    batteries: 2,
+    port: "D-SUB PORT",
+    modules: [
+      {
+        id: "mod-wires-3",
+        type: "wires_3",
+        title: "MOD-01 // 3-WIRE CIRCUIT",
+        wires: ["red", "yellow", "blue"], // Wire 1, 2, 3
+        correctIndex: 1 // Middle wire: Wire 2 (Yellow)
+      },
+      {
+        id: "mod-keypad-easy",
+        type: "cipher_keypad",
+        title: "MOD-02 // DIRECT COLOR KEYPAD",
+        leds: ["red", "yellow", "green"], // 2, 4, 5
+        correctPin: "245" // Direct color numbers!
+      }
+    ]
+  },
+  {
+    level: 2,
+    title: "OPERATION VOLATILE CURRENT (FIELD)",
+    difficulty: "★★☆☆☆",
+    timeLimit: 210,
+    serial: "FX-7203-E",
+    batteries: 3,
+    port: "RCA STEREO",
+    modules: [
+      {
+        id: "mod-wires-4",
+        type: "wires_4",
+        title: "MOD-01 // 4-WIRE COMPLEX",
+        wires: ["blue", "red", "yellow", "white"],
+        correctIndex: 2 // Yellow (Wire 3)
+      },
+      {
+        id: "mod-resistor-1",
+        type: "resistor_decoupler",
+        title: "MOD-02 // RESISTOR DECOUPLER",
+        bands: ["yellow", "violet", "orange"], // 47 kOhm
+        choices: ["24 kΩ", "47 kΩ", "68 kΩ", "91 kΩ"],
+        correctChoice: "47 kΩ"
+      }
+    ]
+  },
+  {
+    level: 3,
+    title: "OPERATION FREQUENCY LOCK (GRID)",
+    difficulty: "★★★☆☆",
+    timeLimit: 190,
+    serial: "TR-6042-K",
+    batteries: 1,
+    port: "USB DIGITAL",
+    modules: [
+      {
+        id: "mod-wires-5",
+        type: "wires_5",
+        title: "MOD-01 // 5-WIRE MATRIX",
+        wires: ["orange", "violet", "black", "red", "grey"],
+        correctIndex: 3 // Red (Wire 4)
+      },
+      {
+        id: "mod-logic-1",
+        type: "logic_switchboard",
+        title: "MOD-02 // LOGIC GATES SWITCHBOARD",
+        switches: [
+          { label: "A", color: "yellow", val: 4 },
+          { label: "B", color: "blue",   val: 6 },
+          { label: "C", color: "red",    val: 2 }
+        ],
+        correctState: [true, false, true]
+      },
+      {
+        id: "mod-simon-1",
+        type: "simon_prism",
+        title: "MOD-03 // SIMON'S QUANTUM BEACON",
+        stages: [
+          { flashes: ["red", "blue", "yellow"] },
+          { flashes: ["green", "red", "blue", "yellow"] }
+        ]
+      }
+    ]
+  },
+  {
+    level: 4,
+    title: "OPERATION VOLTAGE OVERLOAD",
+    difficulty: "★★★★☆",
+    timeLimit: 160,
+    serial: "QZ-9540-A",
+    batteries: 4,
+    port: "PARALLEL CENTRONICS",
+    modules: [
+      {
+        id: "mod-ribbon-1",
+        type: "dual_ribbon",
+        title: "MOD-01 // DUAL-BUS RIBBON CABLE",
+        bus1: ["orange", "violet", "blue"],
+        bus2: ["red", "green", "grey"],
+        correctPair: [0, 2] // Bus1 Orange(3), Bus2 Grey(8)
+      },
+      {
+        id: "mod-memory-1",
+        type: "stage_memory",
+        title: "MOD-02 // TACTICAL STAGE MEMORY",
+        stages: [
+          { display: "BLUE", buttons: [{c:"blue", n:3}, {c:"red", n:1}, {c:"green", n:4}, {c:"yellow", n:2}] },
+          { display: "RED", buttons: [{c:"red", n:2}, {c:"blue", n:4}, {c:"green", n:1}, {c:"yellow", n:3}] },
+          { display: "GREEN", buttons: [{c:"yellow", n:1}, {c:"green", n:4}, {c:"red", n:3}, {c:"blue", n:2}] }
+        ]
+      },
+      {
+        id: "mod-capacitor-1",
+        type: "capacitor_discharge",
+        title: "MOD-03 // CAPACITOR PRESSURE VALVE",
+        stripColor: "yellow"
+      }
+    ]
+  },
+  {
+    level: 5,
+    title: "OPERATION OMEGA DOOMSDAY CORE",
+    difficulty: "★★★★★",
+    timeLimit: 150,
+    serial: "OM-8833-Z",
+    batteries: 5,
+    port: "QUANTUM OPTICAL",
+    modules: [
+      {
+        id: "mod-omega-wires",
+        type: "sequential_wires",
+        title: "MOD-01 // DETONATION CORE CABLES",
+        wires: ["red", "yellow", "violet", "blue", "white", "green"],
+        correctSequence: [0, 1, 3] // Cable 1(Red), Cable 2(Yellow), Cable 4(Blue)
+      },
+      {
+        id: "mod-equalizer-1",
+        type: "quantum_equalizer",
+        title: "MOD-02 // QUANTUM WAVE EQUALIZER",
+        targets: { r: 3, g: 1, b: 4 }
+      },
+      {
+        id: "mod-mastermind-1",
+        type: "mastermind_key",
+        title: "MOD-03 // MASTERMIND LOCKOUT CIPHER",
+        correctKey: ["orange", "green", "red", "yellow"]
+      }
+    ]
+  }
+];
+
+/* ==========================================================================
+   GAME STATE
+   ========================================================================== */
+let currentLevelIndex = 0;
+let timeRemaining = 240;
+let timerInterval = null;
+let strikes = 0;
+let levelDefused = false;
+let defusedModulesCount = 0;
+let soundEnabled = true;
+let crtEnabled = false;
+let moduleStates = {};
+
+/* ==========================================================================
+   THREE.JS 3D SCENE & ENGINE
+   ========================================================================== */
+let scene, camera, renderer, controls;
+let bombGroup = null;
+let raycaster, mouse;
+let interactiveObjects = [];
+let hoveredObject = null;
+let sparkParticles = [];
+let explosionDebris = [];
+let isExploding = false;
+
+let dustParticles = null;
+let rackLeds = [];
+
+function createBunkerEnvironment() {
+  // 1. High-Tech Tactical Workbench Surface
+  const tableCanvas = document.createElement('canvas');
+  tableCanvas.width = 1024;
+  tableCanvas.height = 1024;
+  const tctx = tableCanvas.getContext('2d');
+
+  // Dark metallic base
+  tctx.fillStyle = '#0b0f19';
+  tctx.fillRect(0, 0, 1024, 1024);
+
+  // Subtle grid lines
+  tctx.strokeStyle = '#1e293b';
+  tctx.lineWidth = 1;
+  for (let i = 0; i <= 1024; i += 64) {
+    tctx.beginPath();
+    tctx.moveTo(i, 0); tctx.lineTo(i, 1024);
+    tctx.moveTo(0, i); tctx.lineTo(1024, i);
+    tctx.stroke();
+  }
+
+  // Cyan crosshair grid coordinates
+  tctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+  tctx.lineWidth = 2;
+  for (let i = 128; i < 1024; i += 256) {
+    tctx.strokeRect(i - 4, i - 4, 8, 8);
+  }
+
+  // Concentric Tactical Targeting Rings beneath bomb
+  tctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+  tctx.lineWidth = 2.5;
+  tctx.beginPath();
+  tctx.arc(512, 512, 280, 0, Math.PI * 2);
+  tctx.stroke();
+
+  tctx.setLineDash([12, 8]);
+  tctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
+  tctx.beginPath();
+  tctx.arc(512, 512, 340, 0, Math.PI * 2);
+  tctx.stroke();
+  tctx.setLineDash([]);
+
+  // Hazard border on edge of workbench
+  tctx.fillStyle = '#f59e0b';
+  for (let x = 0; x < 1024; x += 40) {
+    tctx.beginPath();
+    tctx.moveTo(x, 0); tctx.lineTo(x + 20, 0); tctx.lineTo(x, 24); tctx.lineTo(x - 20, 24);
+    tctx.fill();
+    tctx.beginPath();
+    tctx.moveTo(x, 1000); tctx.lineTo(x + 20, 1000); tctx.lineTo(x, 1024); tctx.lineTo(x - 20, 1024);
+    tctx.fill();
+  }
+
+  tctx.fillStyle = '#38bdf8';
+  tctx.font = 'bold 20px monospace';
+  tctx.fillText("TACTICAL EOD WORKBENCH // SECTOR-04", 40, 60);
+  tctx.fillText("STATUS: ACTIVE DEFUSAL ZONE", 680, 60);
+
+  const tableTex = new THREE.CanvasTexture(tableCanvas);
+  const tableMat = new THREE.MeshStandardMaterial({
+    map: tableTex,
+    roughness: 0.45,
+    metalness: 0.65
+  });
+  const tableMesh = new THREE.Mesh(new THREE.PlaneGeometry(50, 50), tableMat);
+  tableMesh.rotation.x = -Math.PI / 2;
+  tableMesh.position.y = -1.9;
+  tableMesh.receiveShadow = true;
+  scene.add(tableMesh);
+
+  // 2. Concrete Bunker Back Wall
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x090d15, roughness: 0.9, metalness: 0.1 });
+  const backWall = new THREE.Mesh(new THREE.PlaneGeometry(100, 40), wallMat);
+  backWall.position.set(0, 16, -24);
+  scene.add(backWall);
+
+  // Metal wall support beams
+  [-18, 0, 18].forEach(bx => {
+    const beam = new THREE.Mesh(new THREE.BoxGeometry(1.2, 40, 1.2), new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.3 }));
+    beam.position.set(bx, 16, -23.5);
+    scene.add(beam);
+  });
+
+  // 3. Telemetry / Server Racks with Blinking LEDs
+  const rackMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.3 });
+  [-17, 17].forEach((rx, rIdx) => {
+    const rack = new THREE.Mesh(new THREE.BoxGeometry(4.2, 16, 3.5), rackMat);
+    rack.position.set(rx, 6, -18);
+    scene.add(rack);
+
+    for (let row = 0; row < 6; row++) {
+      for (let col = 0; col < 4; col++) {
+        const ledCol = (col % 2 === 0) ? 0x22c55e : (col === 1 ? 0x38bdf8 : 0xf59e0b);
+        const ledMat = new THREE.MeshBasicMaterial({ color: ledCol });
+        const led = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), ledMat);
+        led.position.set(rx - 1.4 + col * 0.9, 0.5 + row * 2.1, -16.2);
+        scene.add(led);
+        rackLeds.push({ mesh: led, origCol: ledCol, nextToggle: Math.random() * 2000 });
+      }
+    }
+  });
+
+  // 4. Ambient Atmospheric Dust Motes
+  const particleGeo = new THREE.BufferGeometry();
+  const particleCount = 140;
+  const positions = new Float32Array(particleCount * 3);
+  for (let i = 0; i < particleCount * 3; i += 3) {
+    positions[i] = (Math.random() - 0.5) * 36;
+    positions[i + 1] = Math.random() * 18 - 1;
+    positions[i + 2] = (Math.random() - 0.5) * 32;
+  }
+  particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const particleMat = new THREE.PointsMaterial({
+    color: 0x38bdf8,
+    size: 0.22,
+    transparent: true,
+    opacity: 0.55,
+    blending: THREE.AdditiveBlending
+  });
+  const particleSystem = new THREE.Points(particleGeo, particleMat);
+  scene.add(particleSystem);
+  dustParticles = { system: particleSystem, count: particleCount };
+}
+
+function init3DScene() {
+  const container = document.getElementById('viewport-stage');
+  const canvas = document.getElementById('webgl-canvas');
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x07090e);
+  scene.fog = new THREE.FogExp2(0x07090e, 0.02);
+
+  camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+  camera.position.set(0, 16, 17);
+
+  renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: 'high-performance' });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.maxPolarAngle = Math.PI / 2 - 0.05;
+  controls.minDistance = 9;
+  controls.maxDistance = 32;
+  controls.target.set(0, 0, 0);
+
+  // Bright & Vivid Tactical Lighting
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+  scene.add(ambientLight);
+
+  const overheadLight = new THREE.DirectionalLight(0xfffaed, 1.5);
+  overheadLight.position.set(0, 22, 14);
+  scene.add(overheadLight);
+
+  const frontFillLight = new THREE.DirectionalLight(0xdbeafe, 0.8);
+  frontFillLight.position.set(0, 10, 18);
+  scene.add(frontFillLight);
+
+  const blueRim = new THREE.PointLight(0x38bdf8, 1.2, 40);
+  blueRim.position.set(-16, 8, -10);
+  scene.add(blueRim);
+
+  const amberRim = new THREE.PointLight(0xf59e0b, 1.2, 40);
+  amberRim.position.set(16, 8, -10);
+  scene.add(amberRim);
+
+  // Create interesting high-tech tactical bunker environment
+  createBunkerEnvironment();
+
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+
+  window.addEventListener('resize', onWindowResize);
+  container.addEventListener('mousemove', onMouseMove);
+  container.addEventListener('click', onCanvasClick);
+  container.addEventListener('mousedown', onCanvasMouseDown);
+  container.addEventListener('mouseup', onCanvasMouseUp);
+
+  // Build the bomb right away so it is always present!
+  build3DBomb();
+  onWindowResize();
+
+  animate();
+}
+
+function onWindowResize() {
+  const container = document.getElementById('viewport-stage');
+  if (!container || !renderer || !camera) return;
+  const w = Math.max(container.clientWidth || window.innerWidth, 300);
+  const h = Math.max(container.clientHeight || (window.innerHeight - 54), 200);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
+
+function onMouseMove(event) {
+  const container = document.getElementById('viewport-stage');
+  const rect = container.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(interactiveObjects, true);
+
+  const tooltip = document.getElementById('hover-tooltip');
+  if (intersects.length > 0) {
+    let topObj = intersects[0].object;
+    while (topObj && !topObj.userData.interactive && topObj.parent) {
+      topObj = topObj.parent;
+    }
+    if (topObj && topObj.userData.interactive) {
+      hoveredObject = topObj;
+      container.style.cursor = 'pointer';
+      if (topObj.userData.hint) {
+        tooltip.innerText = topObj.userData.hint;
+        tooltip.style.left = `${event.clientX - rect.left}px`;
+        tooltip.style.top = `${event.clientY - rect.top}px`;
+        tooltip.style.display = 'block';
+      } else {
+        tooltip.style.display = 'none';
+      }
+      return;
+    }
+  }
+  hoveredObject = null;
+  container.style.cursor = 'grab';
+  tooltip.style.display = 'none';
+}
+
+function onCanvasClick(event) {
+  if (!hoveredObject || levelDefused || isExploding) return;
+  if (hoveredObject.userData.onClick) {
+    hoveredObject.userData.onClick();
+  }
+}
+
+function onCanvasMouseDown(event) {
+  if (!hoveredObject || levelDefused || isExploding) return;
+  if (hoveredObject.userData.onMouseDown) {
+    hoveredObject.userData.onMouseDown();
+  }
+}
+
+function onCanvasMouseUp(event) {
+  if (hoveredObject && hoveredObject.userData.onMouseUp) {
+    hoveredObject.userData.onMouseUp();
+  }
+}
+
+/* ==========================================================================
+   3D BOMB CHASSIS & MODULES
+   ========================================================================== */
+function build3DBomb() {
+  if (bombGroup) scene.remove(bombGroup);
+  interactiveObjects = [];
+  isExploding = false;
+  bombGroup = new THREE.Group();
+
+  const lvl = LEVELS[currentLevelIndex];
+
+  // Pelican Case Body
+  const caseWidth = 19;
+  const caseHeight = 3.6;
+  const caseDepth = 13;
+
+  const caseMat = new THREE.MeshStandardMaterial({ color: 0x1b222d, roughness: 0.5, metalness: 0.35 });
+  const caseMesh = new THREE.Mesh(new THREE.BoxGeometry(caseWidth, caseHeight, caseDepth), caseMat);
+  caseMesh.castShadow = true;
+  caseMesh.receiveShadow = true;
+  bombGroup.add(caseMesh);
+
+  // Corner Brackets
+  const cornerMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8, roughness: 0.3 });
+  [[-caseWidth/2, caseHeight/2, -caseDepth/2], [caseWidth/2, caseHeight/2, -caseDepth/2], [-caseWidth/2, caseHeight/2, caseDepth/2], [caseWidth/2, caseHeight/2, caseDepth/2]].forEach(([cx, cy, cz]) => {
+    const bracket = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.4, 1.6), cornerMat);
+    bracket.position.set(cx + (cx < 0 ? 0.8 : -0.8), cy - 0.1, cz + (cz < 0 ? 0.8 : -0.8));
+    bombGroup.add(bracket);
+  });
+
+  // Faceplate
+  const plateMat = new THREE.MeshStandardMaterial({ color: 0x0f141f, roughness: 0.4, metalness: 0.55 });
+  const plateMesh = new THREE.Mesh(new THREE.BoxGeometry(caseWidth - 1.2, 0.3, caseDepth - 1.2), plateMat);
+  plateMesh.position.y = caseHeight / 2 + 0.1;
+  plateMesh.receiveShadow = true;
+  bombGroup.add(plateMesh);
+
+  // Hazard Safety Stripes
+  const hazardCanvas = document.createElement('canvas');
+  hazardCanvas.width = 512;
+  hazardCanvas.height = 32;
+  const hctx = hazardCanvas.getContext('2d');
+  hctx.fillStyle = '#f59e0b';
+  hctx.fillRect(0, 0, 512, 32);
+  hctx.fillStyle = '#111827';
+  for (let i = -32; i < 544; i += 32) {
+    hctx.beginPath();
+    hctx.moveTo(i, 0);
+    hctx.lineTo(i + 24, 0);
+    hctx.lineTo(i - 8, 32);
+    hctx.lineTo(i - 32, 32);
+    hctx.fill();
+  }
+  const hazardTex = new THREE.CanvasTexture(hazardCanvas);
+  hazardTex.wrapS = THREE.RepeatWrapping;
+  hazardTex.repeat.set(3, 1);
+  const hazardMat = new THREE.MeshBasicMaterial({ map: hazardTex });
+
+  const topStripe = new THREE.Mesh(new THREE.PlaneGeometry(caseWidth - 1.8, 0.4), hazardMat);
+  topStripe.rotation.x = -Math.PI / 2;
+  topStripe.position.set(0, plateMesh.position.y + 0.16, -caseDepth/2 + 1.2);
+  bombGroup.add(topStripe);
+
+  const btmStripe = new THREE.Mesh(new THREE.PlaneGeometry(caseWidth - 1.8, 0.4), hazardMat);
+  btmStripe.rotation.x = -Math.PI / 2;
+  btmStripe.position.set(0, plateMesh.position.y + 0.16, caseDepth/2 - 1.2);
+  bombGroup.add(btmStripe);
+
+  // Serial Plate
+  const serialCanvas = document.createElement('canvas');
+  serialCanvas.width = 256;
+  serialCanvas.height = 64;
+  const sctx = serialCanvas.getContext('2d');
+  sctx.fillStyle = '#94a3b8';
+  sctx.fillRect(0, 0, 256, 64);
+  sctx.fillStyle = '#0f172a';
+  sctx.font = 'bold 26px monospace';
+  sctx.fillText(`SN: ${lvl.serial}`, 16, 42);
+  const serialTex = new THREE.CanvasTexture(serialCanvas);
+  const serialMat = new THREE.MeshStandardMaterial({ map: serialTex, roughness: 0.3, metalness: 0.8 });
+  const serialMesh = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 0.9), serialMat);
+  serialMesh.rotation.x = -Math.PI / 2;
+  serialMesh.position.set(-5.6, plateMesh.position.y + 0.17, -4.3);
+  bombGroup.add(serialMesh);
+
+  // Batteries
+  for (let b = 0; b < lvl.batteries; b++) {
+    const battMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.6 });
+    const battMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 1.4, 12), battMat);
+    battMesh.rotation.z = Math.PI / 2;
+    battMesh.position.set(-0.6 + b * 0.7, plateMesh.position.y + 0.25, -4.3);
+    bombGroup.add(battMesh);
+  }
+
+  // Peripheral Port
+  const portCanvas = document.createElement('canvas');
+  portCanvas.width = 180;
+  portCanvas.height = 48;
+  const pctx = portCanvas.getContext('2d');
+  pctx.fillStyle = '#1e293b';
+  pctx.fillRect(0, 0, 180, 48);
+  pctx.fillStyle = '#38bdf8';
+  pctx.font = 'bold 18px monospace';
+  pctx.fillText(lvl.port, 10, 32);
+  const portTex = new THREE.CanvasTexture(portCanvas);
+  const portMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 0.8), new THREE.MeshStandardMaterial({ map: portTex, metalness: 0.7 }));
+  portMesh.rotation.x = -Math.PI / 2;
+  portMesh.position.set(5.8, plateMesh.position.y + 0.17, -4.3);
+  bombGroup.add(portMesh);
+
+  // Modules Assembly
+  build3DModules(bombGroup, lvl.modules, plateMesh.position.y + 0.17);
+
+  scene.add(bombGroup);
+}
+
+function build3DModules(parentGroup, modules, surfaceY) {
+  const modCount = modules.length;
+  const xOffsets = modCount === 2 ? [-4.4, 4.4] : [-5.6, 0, 5.6];
+
+  modules.forEach((mod, idx) => {
+    const modGroup = new THREE.Group();
+    modGroup.position.set(xOffsets[idx], surfaceY, 0.8);
+
+    const panelW = modCount === 2 ? 7.6 : 5.0;
+    const panelD = 7.6;
+    const panelMat = new THREE.MeshStandardMaterial({ color: 0x161e2d, roughness: 0.45, metalness: 0.45 });
+    const panelMesh = new THREE.Mesh(new THREE.BoxGeometry(panelW, 0.15, panelD), panelMat);
+    panelMesh.receiveShadow = true;
+    modGroup.add(panelMesh);
+
+    // Status Indicator LED
+    const ledMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xf59e0b, emissiveIntensity: 0.6 });
+    const ledMesh = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), ledMat);
+    ledMesh.position.set(panelW/2 - 0.7, 0.2, -panelD/2 + 0.7);
+    modGroup.add(ledMesh);
+    modGroup.userData.statusLed = ledMat;
+
+    // Title Plate
+    const titleCanvas = document.createElement('canvas');
+    titleCanvas.width = 256;
+    titleCanvas.height = 36;
+    const tctx = titleCanvas.getContext('2d');
+    tctx.fillStyle = '#0d131f';
+    tctx.fillRect(0, 0, 256, 36);
+    tctx.fillStyle = '#cbd5e1';
+    tctx.font = 'bold 18px monospace';
+    tctx.fillText(mod.title.split('//')[1] || mod.title, 8, 25);
+    const titleTex = new THREE.CanvasTexture(titleCanvas);
+    const titleMesh = new THREE.Mesh(new THREE.PlaneGeometry(panelW - 1.8, 0.45), new THREE.MeshBasicMaterial({ map: titleTex }));
+    titleMesh.rotation.x = -Math.PI / 2;
+    titleMesh.position.set(-0.5, 0.11, -panelD/2 + 0.7);
+    modGroup.add(titleMesh);
+
+    // Builders based on module type
+    if (mod.type.startsWith('wires_')) {
+      build3DWireArray(modGroup, mod, panelW, panelD);
+    } else if (mod.type === 'cipher_keypad') {
+      build3DKeypad(modGroup, mod, panelW, panelD);
+    } else if (mod.type === 'resistor_decoupler') {
+      build3DResistor(modGroup, mod, panelW, panelD);
+    } else if (mod.type === 'logic_switchboard') {
+      build3DLogicSwitchboard(modGroup, mod, panelW, panelD);
+    } else if (mod.type === 'simon_prism') {
+      build3DSimonPrism(modGroup, mod, panelW, panelD);
+    } else if (mod.type === 'dual_ribbon') {
+      build3DDualRibbon(modGroup, mod, panelW, panelD);
+    } else if (mod.type === 'stage_memory') {
+      build3DStageMemory(modGroup, mod, panelW, panelD);
+    } else if (mod.type === 'capacitor_discharge') {
+      build3DCapacitorDischarge(modGroup, mod, panelW, panelD);
+    } else if (mod.type === 'sequential_wires') {
+      build3DSequentialWires(modGroup, mod, panelW, panelD);
+    } else if (mod.type === 'quantum_equalizer') {
+      build3DQuantumEqualizer(modGroup, mod, panelW, panelD);
+    } else if (mod.type === 'mastermind_key') {
+      build3DMastermind(modGroup, mod, panelW, panelD);
+    }
+
+    parentGroup.add(modGroup);
+  });
+}
+
+/* --- 1. 3D Wire Array (Supports 3, 4, 5, 6 wires) --- */
+function build3DWireArray(group, mod, pw, pd) {
+  const numWires = mod.wires.length;
+  const spacing = (pd - 2.4) / (numWires - 1);
+  const zStart = -pd/2 + 1.8;
+  const xLeft = -pw/2 + 0.9;
+  const xRight = pw/2 - 0.9;
+
+  mod.wires.forEach((colorKey, idx) => {
+    const z = zStart + idx * spacing;
+    const col = COLOR_MAP[colorKey];
+
+    const termMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.2 });
+    const termL = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.35, 12), termMat);
+    termL.position.set(xLeft, 0.2, z);
+    group.add(termL);
+
+    const termR = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.35, 12), termMat);
+    termR.position.set(xRight, 0.2, z);
+    group.add(termR);
+
+    const curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(xLeft, 0.28, z),
+      new THREE.Vector3(0, 0.55 + (idx * 0.08), z + 0.35),
+      new THREE.Vector3(xRight, 0.28, z)
+    ]);
+
+    const wireMat = new THREE.MeshStandardMaterial({ color: col.hex, roughness: 0.35, metalness: 0.2 });
+    const wireMesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 32, 0.13, 10, false), wireMat);
+    wireMesh.castShadow = true;
+
+    wireMesh.userData = {
+      interactive: true,
+      hint: `Snip ${col.name} Wire (Wire #${idx + 1})`,
+      onClick: () => {
+        if (isExploding || levelDefused || wireMesh.userData.cut) return;
+        audio.playSnip();
+        wireMesh.userData.cut = true;
+        wireMesh.scale.set(0.4, 0.4, 0.4);
+        wireMesh.position.y -= 0.15;
+        wireMat.color.setHex(0x334155);
+
+        const worldPos = new THREE.Vector3();
+        wireMesh.getWorldPosition(worldPos);
+        spawn3DSparks(worldPos, col.hex);
+
+        if (idx === mod.correctIndex) {
+          mark3DModuleDefused(mod.id, group);
+        } else {
+          addStrike(`Cut incorrect wire #${idx + 1}`);
+        }
+      }
+    };
+
+    interactiveObjects.push(wireMesh);
+    group.add(wireMesh);
+  });
+}
+
+/* --- 2. 3D Keypad Cipher (Direct Color or Cipher) --- */
+function build3DKeypad(group, mod, pw, pd) {
+  moduleStates[mod.id] = { enteredPin: "" };
+
+  const ledCount = mod.leds.length;
+  const ledSpacing = (pw - 2.0) / ledCount;
+  mod.leds.forEach((colorKey, idx) => {
+    const col = COLOR_MAP[colorKey];
+    const ledMat = new THREE.MeshStandardMaterial({
+      color: col.hex,
+      emissive: col.hex,
+      emissiveIntensity: 0.9,
+      roughness: 0.2
+    });
+    const ledMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.24, 0.3, 16), ledMat);
+    ledMesh.position.set(-pw/2 + 1.2 + idx * ledSpacing, 0.2, -pd/2 + 1.8);
+    group.add(ledMesh);
+  });
+
+  const screenCanvas = document.createElement('canvas');
+  screenCanvas.width = 256;
+  screenCanvas.height = 96;
+  const sctx = screenCanvas.getContext('2d');
+  function updateScreen(text = "----", color = "#38bdf8") {
+    sctx.fillStyle = '#000000';
+    sctx.fillRect(0, 0, 256, 96);
+    sctx.strokeStyle = '#1e293b';
+    sctx.lineWidth = 4;
+    sctx.strokeRect(2, 2, 252, 92);
+    sctx.fillStyle = color;
+    sctx.font = 'bold 44px monospace';
+    sctx.textAlign = 'center';
+    sctx.fillText(text, 128, 64);
+    screenTex.needsUpdate = true;
+  }
+  const screenTex = new THREE.CanvasTexture(screenCanvas);
+  updateScreen();
+
+  const screenMesh = new THREE.Mesh(new THREE.PlaneGeometry(pw - 2.0, 1.1), new THREE.MeshBasicMaterial({ map: screenTex }));
+  screenMesh.rotation.x = -Math.PI / 2;
+  screenMesh.position.set(0, 0.12, -pd/2 + 2.8);
+  group.add(screenMesh);
+
+  const btnRows = [
+    ['1', '2', '3'],
+    ['4', '5', '6'],
+    ['7', '8', '9'],
+    ['CLR', '0', 'ENT']
+  ];
+  const btnW = (pw - 2.6) / 3;
+  const btnD = 0.8;
+
+  btnRows.forEach((row, rIdx) => {
+    row.forEach((val, cIdx) => {
+      const btnMat = new THREE.MeshStandardMaterial({
+        color: val === 'ENT' ? 0x0284c7 : val === 'CLR' ? 0x475569 : 0x1e293b,
+        metalness: 0.5,
+        roughness: 0.4
+      });
+      const btnMesh = new THREE.Mesh(new THREE.BoxGeometry(btnW, 0.35, btnD), btnMat);
+      btnMesh.position.set(-pw/2 + 1.2 + cIdx * (btnW + 0.2), 0.22, -pd/2 + 4.1 + rIdx * (btnD + 0.25));
+
+      btnMesh.userData = {
+        interactive: true,
+        hint: `Keypad [${val}]`,
+        onClick: () => {
+          if (isExploding || levelDefused || group.userData.defused) return;
+          audio.playClick();
+          btnMesh.position.y -= 0.12;
+          setTimeout(() => btnMesh.position.y += 0.12, 120);
+
+          const st = moduleStates[mod.id];
+          if (val === 'CLR') {
+            st.enteredPin = "";
+            updateScreen("----");
+          } else if (val === 'ENT') {
+            if (st.enteredPin === mod.correctPin) {
+              updateScreen("OPEN", "#10b981");
+              mark3DModuleDefused(mod.id, group);
+            } else {
+              updateScreen("FAIL", "#ef4444");
+              addStrike("Invalid Cipher PIN entry");
+              setTimeout(() => {
+                st.enteredPin = "";
+                updateScreen("----");
+              }, 700);
+            }
+          } else {
+            if (st.enteredPin.length < mod.correctPin.length) {
+              st.enteredPin += val;
+              updateScreen(st.enteredPin.padEnd(mod.correctPin.length, '-'));
+            }
+          }
+        }
+      };
+
+      interactiveObjects.push(btnMesh);
+      group.add(btnMesh);
+    });
+  });
+}
+
+/* --- 3. 3D Resistor Decoupler --- */
+function build3DResistor(group, mod, pw, pd) {
+  moduleStates[mod.id] = { selectedChoice: null };
+
+  const resMat = new THREE.MeshStandardMaterial({ color: 0xd6cfbe, roughness: 0.4, metalness: 0.2 });
+  const resMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 3.2, 24), resMat);
+  resMesh.rotation.z = Math.PI / 2;
+  resMesh.position.set(0, 0.55, -pd/2 + 2.4);
+  group.add(resMesh);
+
+  const leadMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.2 });
+  const leadL = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.2, 10), leadMat);
+  leadL.rotation.z = Math.PI / 2;
+  leadL.position.set(-2.2, 0.55, resMesh.position.z);
+  group.add(leadL);
+
+  const leadR = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.2, 10), leadMat);
+  leadR.rotation.z = Math.PI / 2;
+  leadR.position.set(2.2, 0.55, resMesh.position.z);
+  group.add(leadR);
+
+  mod.bands.forEach((cKey, bIdx) => {
+    const col = COLOR_MAP[cKey];
+    const bandMesh = new THREE.Mesh(
+      new THREE.TorusGeometry(0.46, 0.08, 8, 24),
+      new THREE.MeshStandardMaterial({ color: col.hex, roughness: 0.3 })
+    );
+    bandMesh.rotation.y = Math.PI / 2;
+    bandMesh.position.set(-0.8 + bIdx * 0.7, resMesh.position.y, resMesh.position.z);
+    group.add(bandMesh);
+  });
+
+  const goldMesh = new THREE.Mesh(
+    new THREE.TorusGeometry(0.46, 0.08, 8, 24),
+    new THREE.MeshStandardMaterial({ color: 0xeab308, metalness: 0.8, roughness: 0.2 })
+  );
+  goldMesh.rotation.y = Math.PI / 2;
+  goldMesh.position.set(1.1, resMesh.position.y, resMesh.position.z);
+  group.add(goldMesh);
+
+  const dialGroup = new THREE.Group();
+  dialGroup.position.set(0, 0.2, 0.8);
+  const knobMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.6, roughness: 0.3 });
+  const knobMesh = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.4, 0.6, 24), knobMat);
+  dialGroup.add(knobMesh);
+
+  const pointerMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.65, 0.8), new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+  pointerMesh.position.set(0, 0.05, -0.7);
+  dialGroup.add(pointerMesh);
+  group.add(dialGroup);
+
+  mod.choices.forEach((choice, cIdx) => {
+    const cCanvas = document.createElement('canvas');
+    cCanvas.width = 160;
+    cCanvas.height = 48;
+    const ctx = cCanvas.getContext('2d');
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, 160, 48);
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 22px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(choice, 80, 32);
+    const cTex = new THREE.CanvasTexture(cCanvas);
+
+    const cMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.6), new THREE.MeshBasicMaterial({ map: cTex }));
+    cMesh.rotation.x = -Math.PI / 2;
+
+    const angle = cIdx * (Math.PI / 2) - Math.PI / 2;
+    cMesh.position.set(Math.cos(angle) * 2.2, 0.12, 0.8 + Math.sin(angle) * 1.8);
+
+    cMesh.userData = {
+      interactive: true,
+      hint: `Set Dial to ${choice}`,
+      onClick: () => {
+        if (isExploding || levelDefused || group.userData.defused) return;
+        audio.playClick();
+        moduleStates[mod.id].selectedChoice = choice;
+        dialGroup.rotation.y = -cIdx * (Math.PI / 2);
+      }
+    };
+    interactiveObjects.push(cMesh);
+    group.add(cMesh);
+  });
+
+  const bypassMesh = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.3, 0.8), new THREE.MeshStandardMaterial({ color: 0xdc2626, metalness: 0.4 }));
+  bypassMesh.position.set(0, 0.18, pd/2 - 0.9);
+  bypassMesh.userData = {
+    interactive: true,
+    hint: "Engage Resistor Bypass",
+    onClick: () => {
+      if (isExploding || levelDefused || group.userData.defused) return;
+      audio.playClick();
+      bypassMesh.position.y -= 0.1;
+      setTimeout(() => bypassMesh.position.y += 0.1, 120);
+
+      if (moduleStates[mod.id].selectedChoice === mod.correctChoice) {
+        mark3DModuleDefused(mod.id, group);
+      } else {
+        addStrike("Incorrect Resistor Calibration selected");
+      }
+    }
+  };
+  interactiveObjects.push(bypassMesh);
+  group.add(bypassMesh);
+}
+
+/* --- 4. 3D Logic Switchboard --- */
+function build3DLogicSwitchboard(group, mod, pw, pd) {
+  moduleStates[mod.id] = { states: [false, false, false] };
+
+  const schCanvas = document.createElement('canvas');
+  schCanvas.width = 256;
+  schCanvas.height = 48;
+  const sctx = schCanvas.getContext('2d');
+  sctx.fillStyle = '#0f172a';
+  sctx.fillRect(0, 0, 256, 48);
+  sctx.fillStyle = '#38bdf8';
+  sctx.font = 'bold 15px monospace';
+  sctx.fillText("Q=(A AND B) XOR C", 20, 30);
+  const schTex = new THREE.CanvasTexture(schCanvas);
+  const schMesh = new THREE.Mesh(new THREE.PlaneGeometry(pw - 1.2, 0.55), new THREE.MeshBasicMaterial({ map: schTex }));
+  schMesh.rotation.x = -Math.PI / 2;
+  schMesh.position.set(0, 0.11, -pd/2 + 1.8);
+  group.add(schMesh);
+
+  const swSpacing = (pw - 2.0) / 3;
+  mod.switches.forEach((sw, idx) => {
+    const swGroup = new THREE.Group();
+    const x = -pw/2 + 1.0 + idx * swSpacing;
+    swGroup.position.set(x, 0.1, 0.2);
+
+    const bzMesh = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.2, 1.2), new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.7 }));
+    swGroup.add(bzMesh);
+
+    const col = COLOR_MAP[sw.color];
+    const ledMat = new THREE.MeshStandardMaterial({ color: col.hex, emissive: col.hex, emissiveIntensity: 0.8 });
+    const ledMesh = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12), ledMat);
+    ledMesh.position.set(0, 0.2, -0.7);
+    swGroup.add(ledMesh);
+
+    const leverMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.2 });
+    const leverMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.9, 12), leverMat);
+    leverMesh.position.set(0, 0.45, 0);
+    leverMesh.rotation.x = -0.45;
+    swGroup.add(leverMesh);
+
+    swGroup.userData = {
+      interactive: true,
+      hint: `Toggle Switch ${sw.label} (${sw.color.toUpperCase()})`,
+      onClick: () => {
+        if (isExploding || levelDefused || group.userData.defused) return;
+        audio.playClick();
+        const cur = moduleStates[mod.id].states[idx];
+        moduleStates[mod.id].states[idx] = !cur;
+        leverMesh.rotation.x = !cur ? 0.45 : -0.45;
+      }
+    };
+    interactiveObjects.push(swGroup);
+    group.add(swGroup);
+  });
+
+  const actMesh = new THREE.Mesh(new THREE.BoxGeometry(pw - 2.0, 0.3, 0.8), new THREE.MeshStandardMaterial({ color: 0xdc2626, metalness: 0.5 }));
+  actMesh.position.set(0, 0.18, pd/2 - 1.0);
+  actMesh.userData = {
+    interactive: true,
+    hint: "Engage Logic Relay",
+    onClick: () => {
+      if (isExploding || levelDefused || group.userData.defused) return;
+      audio.playClick();
+      actMesh.position.y -= 0.1;
+      setTimeout(() => actMesh.position.y += 0.1, 120);
+
+      const st = moduleStates[mod.id];
+      const match = st.states.every((v, i) => v === mod.correctState[i]);
+      if (match) {
+        mark3DModuleDefused(mod.id, group);
+      } else {
+        addStrike("Logic circuit breaker tripped!");
+      }
+    }
+  };
+  interactiveObjects.push(actMesh);
+  group.add(actMesh);
+}
+
+/* --- 5. 3D Simon's Quantum Memory Prism --- */
+function build3DSimonPrism(group, mod, pw, pd) {
+  moduleStates[mod.id] = { currentStage: 0, inputIndex: 0, isPlaying: false };
+
+  const colors = [
+    { name: 'red', hex: 0xef4444, pos: [-1.1, 0.6, -1.0], freq: 330 },
+    { name: 'blue', hex: 0x3b82f6, pos: [ 1.1, 0.6, -1.0], freq: 440 },
+    { name: 'green', hex: 0x22c55e, pos: [-1.1, 0.6,  1.1], freq: 554 },
+    { name: 'yellow', hex: 0xeab308, pos: [ 1.1, 0.6,  1.1], freq: 659 }
+  ];
+
+  const crystalMeshes = {};
+  colors.forEach(item => {
+    const cMat = new THREE.MeshStandardMaterial({
+      color: item.hex,
+      emissive: item.hex,
+      emissiveIntensity: 0.25,
+      roughness: 0.2,
+      metalness: 0.1
+    });
+    const cMesh = new THREE.Mesh(new THREE.ConeGeometry(0.9, 1.4, 4), cMat);
+    cMesh.position.set(item.pos[0], item.pos[1], item.pos[2]);
+    crystalMeshes[item.name] = { mesh: cMesh, mat: cMat, freq: item.freq };
+
+    cMesh.userData = {
+      interactive: true,
+      hint: `Resonant Crystal [${item.name.toUpperCase()}]`,
+      onClick: () => {
+        if (isExploding || levelDefused || group.userData.defused || moduleStates[mod.id].isPlaying) return;
+        flash3DCrystal(item.name);
+        handle3DCrystalInput(item.name);
+      }
+    };
+    interactiveObjects.push(cMesh);
+    group.add(cMesh);
+  });
+
+  function flash3DCrystal(colorName) {
+    const item = crystalMeshes[colorName];
+    if (!item) return;
+    item.mat.emissiveIntensity = 1.6;
+    item.mesh.scale.set(1.15, 1.15, 1.15);
+    audio.playTone(item.freq, 0.25);
+    setTimeout(() => {
+      item.mat.emissiveIntensity = 0.25;
+      item.mesh.scale.set(1, 1, 1);
+    }, 320);
+  }
+
+  function play3DSequence() {
+    const st = moduleStates[mod.id];
+    if (st.isPlaying || group.userData.defused) return;
+    st.isPlaying = true;
+    st.inputIndex = 0;
+    const stage = mod.stages[st.currentStage];
+    stage.flashes.forEach((cName, idx) => {
+      setTimeout(() => {
+        flash3DCrystal(cName);
+        if (idx === stage.flashes.length - 1) {
+          setTimeout(() => { st.isPlaying = false; }, 400);
+        }
+      }, (idx + 1) * 650);
+    });
+  }
+
+  function handle3DCrystalInput(cName) {
+    const st = moduleStates[mod.id];
+    const map0 = { red: "blue", blue: "yellow", green: "red", yellow: "green" };
+    const map1 = { red: "yellow", blue: "green", green: "blue", yellow: "red" };
+    const map2 = { red: "green", blue: "red", green: "yellow", yellow: "blue" };
+    const transMap = strikes === 0 ? map0 : strikes === 1 ? map1 : map2;
+    const stage = mod.stages[st.currentStage];
+    const expected = transMap[stage.flashes[st.inputIndex]];
+
+    if (cName === expected) {
+      st.inputIndex++;
+      if (st.inputIndex >= stage.flashes.length) {
+        st.currentStage++;
+        if (st.currentStage >= mod.stages.length) {
+          mark3DModuleDefused(mod.id, group);
+        } else {
+          setTimeout(play3DSequence, 800);
+        }
+      }
+    } else {
+      addStrike("Incorrect crystal resonance response!");
+      st.inputIndex = 0;
+      setTimeout(play3DSequence, 900);
+    }
+  }
+
+  setTimeout(play3DSequence, 1200);
+}
+
+/* --- 6. 3D Dual Ribbon Bus --- */
+function build3DDualRibbon(group, mod, pw, pd) {
+  moduleStates[mod.id] = { selectedBus1: null, selectedBus2: null };
+  const wireWidth = pw/2 - 0.9;
+  const b1Meshes = [];
+  const b2Meshes = [];
+
+  mod.bus1.forEach((cKey, idx) => {
+    const col = COLOR_MAP[cKey];
+    const rMesh = new THREE.Mesh(new THREE.BoxGeometry(wireWidth, 0.12, 0.7), new THREE.MeshStandardMaterial({ color: col.hex, roughness: 0.3 }));
+    rMesh.position.set(-pw/4 - 0.2, 0.15, -pd/2 + 2.0 + idx * 1.0);
+    rMesh.userData = {
+      interactive: true,
+      hint: `Bus 1: Line ${idx + 1} (${col.name})`,
+      onClick: () => {
+        if (isExploding || levelDefused || group.userData.defused) return;
+        audio.playClick();
+        moduleStates[mod.id].selectedBus1 = idx;
+        b1Meshes.forEach((m, i) => m.material.emissive.setHex(i === idx ? 0xffffff : 0x000000));
+      }
+    };
+    b1Meshes.push(rMesh);
+    interactiveObjects.push(rMesh);
+    group.add(rMesh);
+  });
+
+  mod.bus2.forEach((cKey, idx) => {
+    const col = COLOR_MAP[cKey];
+    const rMesh = new THREE.Mesh(new THREE.BoxGeometry(wireWidth, 0.12, 0.7), new THREE.MeshStandardMaterial({ color: col.hex, roughness: 0.3 }));
+    rMesh.position.set(pw/4 + 0.2, 0.15, -pd/2 + 2.0 + idx * 1.0);
+    rMesh.userData = {
+      interactive: true,
+      hint: `Bus 2: Line ${idx + 1} (${col.name})`,
+      onClick: () => {
+        if (isExploding || levelDefused || group.userData.defused) return;
+        audio.playClick();
+        moduleStates[mod.id].selectedBus2 = idx;
+        b2Meshes.forEach((m, i) => m.material.emissive.setHex(i === idx ? 0xffffff : 0x000000));
+      }
+    };
+    b2Meshes.push(rMesh);
+    interactiveObjects.push(rMesh);
+    group.add(rMesh);
+  });
+
+  const cutBtn = new THREE.Mesh(new THREE.BoxGeometry(pw - 1.6, 0.3, 0.8), new THREE.MeshStandardMaterial({ color: 0xdc2626, metalness: 0.5 }));
+  cutBtn.position.set(0, 0.18, pd/2 - 0.9);
+  cutBtn.userData = {
+    interactive: true,
+    hint: "Sever Selected Harmonic Pair",
+    onClick: () => {
+      const st = moduleStates[mod.id];
+      if (isExploding || levelDefused || group.userData.defused || st.selectedBus1 === null || st.selectedBus2 === null) return;
+      audio.playSnip();
+      if (st.selectedBus1 === mod.correctPair[0] && st.selectedBus2 === mod.correctPair[1]) {
+        b1Meshes[st.selectedBus1].scale.set(0.3, 0.3, 0.3);
+        b2Meshes[st.selectedBus2].scale.set(0.3, 0.3, 0.3);
+        mark3DModuleDefused(mod.id, group);
+      } else {
+        addStrike("Non-harmonic ribbon pair severed!");
+      }
+    }
+  };
+  interactiveObjects.push(cutBtn);
+  group.add(cutBtn);
+}
+
+/* --- 7. 3D Stage Memory Pad --- */
+function build3DStageMemory(group, mod, pw, pd) {
+  moduleStates[mod.id] = { stageIndex: 0, history: [] };
+
+  const mCanvas = document.createElement('canvas');
+  mCanvas.width = 256;
+  mCanvas.height = 80;
+  const mctx = mCanvas.getContext('2d');
+  function updateMemScreen(txt = "BLUE") {
+    mctx.fillStyle = '#000';
+    mctx.fillRect(0, 0, 256, 80);
+    mctx.fillStyle = '#38bdf8';
+    mctx.font = 'bold 36px monospace';
+    mctx.textAlign = 'center';
+    mctx.fillText(txt, 128, 52);
+    mTex.needsUpdate = true;
+  }
+  const mTex = new THREE.CanvasTexture(mCanvas);
+  updateMemScreen();
+
+  const mScreen = new THREE.Mesh(new THREE.PlaneGeometry(pw - 1.6, 1.0), new THREE.MeshBasicMaterial({ map: mTex }));
+  mScreen.rotation.x = -Math.PI / 2;
+  mScreen.position.set(0, 0.12, -pd/2 + 2.2);
+  group.add(mScreen);
+
+  const btnW = (pw - 2.2) / 4;
+  const buttonsGroup = new THREE.Group();
+  buttonsGroup.position.set(0, 0, 0.6);
+
+  function rebuildButtons() {
+    while (buttonsGroup.children.length > 0) {
+      const c = buttonsGroup.children[0];
+      const idx = interactiveObjects.indexOf(c);
+      if (idx !== -1) interactiveObjects.splice(idx, 1);
+      buttonsGroup.remove(c);
+    }
+
+    const st = moduleStates[mod.id];
+    const sData = mod.stages[st.stageIndex];
+    updateMemScreen(sData.display);
+
+    sData.buttons.forEach((bData, posIdx) => {
+      const bCanvas = document.createElement('canvas');
+      bCanvas.width = 64;
+      bCanvas.height = 64;
+      const bctx = bCanvas.getContext('2d');
+      bctx.fillStyle = '#1e293b';
+      bctx.fillRect(0, 0, 64, 64);
+      bctx.fillStyle = '#f8fafc';
+      bctx.font = 'bold 36px monospace';
+      bctx.textAlign = 'center';
+      bctx.fillText(bData.n, 32, 46);
+      const bTex = new THREE.CanvasTexture(bCanvas);
+
+      const bMesh = new THREE.Mesh(new THREE.BoxGeometry(btnW, 0.35, 1.2), new THREE.MeshStandardMaterial({ map: bTex, roughness: 0.3 }));
+      bMesh.position.set(-pw/2 + 1.0 + posIdx * (btnW + 0.25), 0.2, 0);
+
+      bMesh.userData = {
+        interactive: true,
+        hint: `Memory Button [${bData.n}]`,
+        onClick: () => {
+          if (isExploding || levelDefused || group.userData.defused) return;
+          audio.playClick();
+          bMesh.position.y -= 0.12;
+          setTimeout(() => bMesh.position.y += 0.12, 120);
+
+          let valid = false;
+          if (st.stageIndex === 0 && bData.n === 3) valid = true;
+          else if (st.stageIndex === 1 && posIdx === st.history[0].pos) valid = true;
+          else if (st.stageIndex === 2 && bData.n === st.history[0].num) valid = true;
+
+          if (valid) {
+            st.history.push({ pos: posIdx, num: bData.n });
+            st.stageIndex++;
+            if (st.stageIndex >= 3) {
+              updateMemScreen("DISARM", "#10b981");
+              mark3DModuleDefused(mod.id, group);
+            } else {
+              rebuildButtons();
+            }
+          } else {
+            addStrike("Memory matrix de-synchronized!");
+            st.stageIndex = 0;
+            st.history = [];
+            rebuildButtons();
+          }
+        }
+      };
+      interactiveObjects.push(bMesh);
+      buttonsGroup.add(bMesh);
+    });
+  }
+
+  group.add(buttonsGroup);
+  rebuildButtons();
+}
+
+/* --- 8. 3D Capacitor Pressure Valve (Hold Button) --- */
+function build3DCapacitorDischarge(group, mod, pw, pd) {
+  moduleStates[mod.id] = { isHolding: false };
+
+  const capBtn = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.8, 0.8, 32), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.25 }));
+  capBtn.position.set(0, 0.5, 0);
+
+  const stripMat = new THREE.MeshStandardMaterial({ color: 0x05070a, roughness: 0.8 });
+  const stripMesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.15, 3.2), stripMat);
+  stripMesh.position.set(pw/2 - 0.7, 0.12, 0);
+  group.add(stripMesh);
+
+  capBtn.userData = {
+    interactive: true,
+    hint: "Click & Hold Discharge Actuator",
+    onMouseDown: () => {
+      if (isExploding || levelDefused || group.userData.defused) return;
+      audio.playClick();
+      moduleStates[mod.id].isHolding = true;
+      capBtn.position.y = 0.25;
+      stripMat.color.setHex(COLOR_MAP[mod.stripColor].hex);
+      stripMat.emissive.setHex(COLOR_MAP[mod.stripColor].hex);
+      stripMat.emissiveIntensity = 1.0;
+    },
+    onMouseUp: () => {
+      const st = moduleStates[mod.id];
+      if (!st.isHolding) return;
+      st.isHolding = false;
+      capBtn.position.y = 0.5;
+      stripMat.color.setHex(0x05070a);
+      stripMat.emissive.setHex(0x000000);
+
+      const sec = Math.floor(timeRemaining % 60);
+      const secStr = String(sec).padStart(2, '0');
+      if (secStr.includes('4')) {
+        mark3DModuleDefused(mod.id, group);
+      } else {
+        addStrike(`Released at :${secStr} (Needed '4' in seconds display!)`);
+      }
+    }
+  };
+
+  interactiveObjects.push(capBtn);
+  group.add(capBtn);
+}
+
+/* --- 9. 3D Detonation Core Sequential Cables (Level 5) --- */
+function build3DSequentialWires(group, mod, pw, pd) {
+  moduleStates[mod.id] = { currentStep: 0 };
+  const numW = mod.wires.length;
+  const spacing = (pd - 2.2) / (numW - 1);
+
+  mod.wires.forEach((cKey, idx) => {
+    const col = COLOR_MAP[cKey];
+    const z = -pd/2 + 1.8 + idx * spacing;
+
+    const curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-pw/2 + 0.9, 0.25, z),
+      new THREE.Vector3(0, 0.6 + idx * 0.08, z + 0.3),
+      new THREE.Vector3(pw/2 - 0.9, 0.25, z)
+    ]);
+    const wireMat = new THREE.MeshStandardMaterial({ color: col.hex, roughness: 0.3, metalness: 0.3 });
+    const wireMesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 32, 0.14, 10, false), wireMat);
+
+    wireMesh.userData = {
+      interactive: true,
+      hint: `Snip Core Cable ${idx + 1} (${col.name})`,
+      onClick: () => {
+        if (isExploding || levelDefused || group.userData.defused || wireMesh.userData.cut) return;
+        audio.playSnip();
+        wireMesh.userData.cut = true;
+        wireMesh.scale.set(0.4, 0.4, 0.4);
+        wireMesh.position.y -= 0.15;
+        wireMat.color.setHex(0x334155);
+
+        const worldPos = new THREE.Vector3();
+        wireMesh.getWorldPosition(worldPos);
+        spawn3DSparks(worldPos, col.hex);
+
+        const st = moduleStates[mod.id];
+        const expectedIdx = mod.correctSequence[st.currentStep];
+        if (idx === expectedIdx) {
+          st.currentStep++;
+          if (st.currentStep >= mod.correctSequence.length) {
+            mark3DModuleDefused(mod.id, group);
+          }
+        } else {
+          addStrike("Detonation core sequential lock breached! Strike added.");
+        }
+      }
+    };
+
+    interactiveObjects.push(wireMesh);
+    group.add(wireMesh);
+  });
+}
+
+/* --- 10. 3D Quantum Equalizer (Level 5) --- */
+function build3DQuantumEqualizer(group, mod, pw, pd) {
+  moduleStates[mod.id] = { r: 0, g: 0, b: 0 };
+
+  const oscCanvas = document.createElement('canvas');
+  oscCanvas.width = 256;
+  oscCanvas.height = 96;
+  const octx = oscCanvas.getContext('2d');
+  const oscTex = new THREE.CanvasTexture(oscCanvas);
+
+  function drawOscilloscope(t) {
+    octx.fillStyle = '#05070a';
+    octx.fillRect(0, 0, 256, 96);
+    const st = moduleStates[mod.id];
+    const isLocked = st.r === mod.targets.r && st.g === mod.targets.g && st.b === mod.targets.b;
+    octx.strokeStyle = isLocked ? '#10b981' : '#38bdf8';
+    octx.lineWidth = isLocked ? 4 : 2;
+    octx.beginPath();
+    for (let x = 0; x < 256; x++) {
+      const y = 48 + Math.sin(x * 0.08 + t + st.r * 0.4) * (10 + st.r * 2) + Math.sin(x * 0.12 - t + st.g * 0.3) * (8 + st.g * 2);
+      if (x === 0) octx.moveTo(x, y);
+      else octx.lineTo(x, y);
+    }
+    octx.stroke();
+    oscTex.needsUpdate = true;
+  }
+
+  const oscMesh = new THREE.Mesh(new THREE.PlaneGeometry(pw - 1.2, 1.2), new THREE.MeshBasicMaterial({ map: oscTex }));
+  oscMesh.rotation.x = -Math.PI / 2;
+  oscMesh.position.set(0, 0.12, -pd/2 + 2.0);
+  group.add(oscMesh);
+
+  ['r', 'g', 'b'].forEach((ch, cIdx) => {
+    const trackZ = -0.4 + cIdx * 1.1;
+    const colHex = ch === 'r' ? 0xef4444 : ch === 'g' ? 0x22c55e : 0x3b82f6;
+
+    const trk = new THREE.Mesh(new THREE.BoxGeometry(pw - 1.6, 0.08, 0.15), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+    trk.position.set(0, 0.12, trackZ);
+    group.add(trk);
+
+    const knob = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.3, 0.4), new THREE.MeshStandardMaterial({ color: colHex, metalness: 0.6 }));
+    knob.position.set(-pw/2 + 1.2, 0.22, trackZ);
+
+    knob.userData = {
+      interactive: true,
+      hint: `Adjust Fader [${ch.toUpperCase()}]`,
+      onClick: () => {
+        if (isExploding || levelDefused || group.userData.defused) return;
+        audio.playClick();
+        const st = moduleStates[mod.id];
+        st[ch] = (st[ch] + 1) % 10;
+        const progress = st[ch] / 9;
+        knob.position.x = (-pw/2 + 1.2) + progress * (pw - 2.4);
+      }
+    };
+    interactiveObjects.push(knob);
+    group.add(knob);
+  });
+
+  const lockBtn = new THREE.Mesh(new THREE.BoxGeometry(pw - 1.6, 0.3, 0.7), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
+  lockBtn.position.set(0, 0.18, pd/2 - 0.8);
+  lockBtn.userData = {
+    interactive: true,
+    hint: "Engage Harmonic Frequency Lock",
+    onClick: () => {
+      if (isExploding || levelDefused || group.userData.defused) return;
+      audio.playClick();
+      const st = moduleStates[mod.id];
+      if (st.r === mod.targets.r && st.g === mod.targets.g && st.b === mod.targets.b) {
+        mark3DModuleDefused(mod.id, group);
+      } else {
+        addStrike("Wave dissonance triggered power surge!");
+      }
+    }
+  };
+  interactiveObjects.push(lockBtn);
+  group.add(lockBtn);
+
+  group.userData.onUpdate = (t) => drawOscilloscope(t);
+}
+
+/* --- 11. 3D Mastermind Lockout (Level 5) --- */
+function build3DMastermind(group, mod, pw, pd) {
+  moduleStates[mod.id] = { selectedSlots: [null, null, null, null], activeSlot: 0 };
+  const slotSpheres = [];
+
+  for (let s = 0; s < 4; s++) {
+    const sMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 });
+    const sMesh = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), sMat);
+    sMesh.position.set(-pw/2 + 1.2 + s * 1.1, 0.3, -1.2);
+    slotSpheres.push({ mesh: sMesh, mat: sMat });
+
+    sMesh.userData = {
+      interactive: true,
+      hint: `Select Slot #${s + 1}`,
+      onClick: () => {
+        audio.playClick();
+        moduleStates[mod.id].activeSlot = s;
+      }
+    };
+    interactiveObjects.push(sMesh);
+    group.add(sMesh);
+  }
+
+  const colorKeys = Object.keys(COLOR_MAP);
+  colorKeys.forEach((cKey, cIdx) => {
+    const col = COLOR_MAP[cKey];
+    const cMat = new THREE.MeshStandardMaterial({ color: col.hex, roughness: 0.3 });
+    const cMesh = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.2, 0.45), cMat);
+    const row = Math.floor(cIdx / 5);
+    const colIdx = cIdx % 5;
+    cMesh.position.set(-pw/2 + 1.1 + colIdx * 0.7, 0.15, 0.2 + row * 0.65);
+
+    cMesh.userData = {
+      interactive: true,
+      hint: `Choose Color [${col.name}]`,
+      onClick: () => {
+        if (isExploding || levelDefused || group.userData.defused) return;
+        audio.playClick();
+        const st = moduleStates[mod.id];
+        const s = st.activeSlot;
+        st.selectedSlots[s] = cKey;
+        slotSpheres[s].mat.color.setHex(col.hex);
+        st.activeSlot = (s + 1) % 4;
+      }
+    };
+    interactiveObjects.push(cMesh);
+    group.add(cMesh);
+  });
+
+  const subBtn = new THREE.Mesh(new THREE.BoxGeometry(pw - 1.4, 0.3, 0.7), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
+  subBtn.position.set(0, 0.18, pd/2 - 0.8);
+  subBtn.userData = {
+    interactive: true,
+    hint: "Submit Master Key Cipher",
+    onClick: () => {
+      const st = moduleStates[mod.id];
+      if (isExploding || levelDefused || group.userData.defused || st.selectedSlots.some(v => v === null)) return;
+      audio.playClick();
+
+      const target = mod.correctKey;
+      const guess = st.selectedSlots;
+      const match = guess.every((v, i) => v === target[i]);
+      if (match) {
+        mark3DModuleDefused(mod.id, group);
+      } else {
+        addStrike("Mastermind cipher rejected!");
+      }
+    }
+  };
+  interactiveObjects.push(subBtn);
+  group.add(subBtn);
+}
+
+/* ==========================================================================
+   PARTICLES & 3D EXPLOSION
+   ========================================================================== */
+function spawn3DSparks(pos, colorHex) {
+  const count = 28;
+  const geom = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+  const velocities = [];
+
+  for (let i = 0; i < count; i++) {
+    positions[i * 3] = pos.x;
+    positions[i * 3 + 1] = pos.y;
+    positions[i * 3 + 2] = pos.z;
+    velocities.push(new THREE.Vector3(
+      (Math.random() - 0.5) * 6,
+      Math.random() * 6 + 2,
+      (Math.random() - 0.5) * 6
+    ));
+  }
+  geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+  const mat = new THREE.PointsMaterial({ color: colorHex, size: 0.25, transparent: true, opacity: 1.0 });
+  const pSystem = new THREE.Points(geom, mat);
+  scene.add(pSystem);
+
+  sparkParticles.push({
+    mesh: pSystem,
+    velocities: velocities,
+    life: 0.65,
+    maxLife: 0.65
+  });
+}
+
+function trigger3DExplosion() {
+  if (isExploding) return;
+  isExploding = true;
+  audio.playExplosion();
+
+  const flash = document.getElementById('explosion-flash');
+  flash.classList.add('active');
+  const stage = document.getElementById('viewport-stage');
+  stage.classList.add('screen-shake');
+
+  if (bombGroup) {
+    bombGroup.traverse(child => {
+      if (child.isMesh && child.geometry) {
+        const worldPos = new THREE.Vector3();
+        child.getWorldPosition(worldPos);
+        explosionDebris.push({
+          mesh: child,
+          vel: new THREE.Vector3((Math.random() - 0.5) * 12, Math.random() * 12 + 4, (Math.random() - 0.5) * 12),
+          rotVel: new THREE.Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10)
+        });
+      }
+    });
+  }
+
+  setTimeout(() => {
+    flash.classList.remove('active');
+    stage.classList.remove('screen-shake');
+
+    const lvl = LEVELS[currentLevelIndex];
+    document.getElementById('defeat-reason').innerText = strikes >= 3 ? "3 Critical Strikes Incurred!" : "Countdown Expired!";
+    document.getElementById('defeat-level').innerText = `Level ${lvl.level} - ${lvl.title}`;
+    document.getElementById('defeat-modules').innerText = `${defusedModulesCount} of ${lvl.modules.length} Disarmed`;
+    document.getElementById('modal-defeat').style.display = 'flex';
+  }, 1400);
+}
+
+let animClock = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  animClock += 0.03;
+
+  if (controls) controls.update();
+
+  // Ambient bunker particle drift
+  if (dustParticles && dustParticles.system) {
+    const pos = dustParticles.system.geometry.attributes.position.array;
+    for (let i = 1; i < dustParticles.count * 3; i += 3) {
+      pos[i] += 0.012;
+      if (pos[i] > 18) pos[i] = -1;
+    }
+    dustParticles.system.geometry.attributes.position.needsUpdate = true;
+  }
+
+  // Blinking server LEDs
+  const now = performance.now();
+  rackLeds.forEach(item => {
+    if (now > item.nextToggle) {
+      item.mesh.visible = !item.mesh.visible;
+      item.nextToggle = now + 150 + Math.random() * 1200;
+    }
+  });
+
+  if (bombGroup) {
+    bombGroup.traverse(child => {
+      if (child.userData && child.userData.onUpdate) {
+        child.userData.onUpdate(animClock);
+      }
+    });
+  }
+
+  for (let i = sparkParticles.length - 1; i >= 0; i--) {
+    const sp = sparkParticles[i];
+    sp.life -= 0.018;
+    const posAttr = sp.mesh.geometry.attributes.position;
+    for (let j = 0; j < sp.velocities.length; j++) {
+      const v = sp.velocities[j];
+      v.y -= 0.18;
+      posAttr.array[j * 3] += v.x * 0.02;
+      posAttr.array[j * 3 + 1] += v.y * 0.02;
+      posAttr.array[j * 3 + 2] += v.z * 0.02;
+    }
+    posAttr.needsUpdate = true;
+    sp.mesh.material.opacity = sp.life / sp.maxLife;
+
+    if (sp.life <= 0) {
+      scene.remove(sp.mesh);
+      sparkParticles.splice(i, 1);
+    }
+  }
+
+  if (isExploding) {
+    explosionDebris.forEach(deb => {
+      deb.vel.y -= 0.35;
+      deb.mesh.position.addScaledVector(deb.vel, 0.02);
+      deb.mesh.rotation.x += deb.rotVel.x * 0.02;
+      deb.mesh.rotation.y += deb.rotVel.y * 0.02;
+    });
+  }
+
+  if (renderer && scene && camera) {
+    renderer.render(scene, camera);
+  }
+}
+
+/* ==========================================================================
+   LEVEL MANAGEMENT & "SUCCESSFUL" MODAL
+   ========================================================================== */
+function initLevel(lvlIndex) {
+  currentLevelIndex = lvlIndex;
+  const lvl = LEVELS[currentLevelIndex];
+
+  clearInterval(timerInterval);
+  strikes = 0;
+  levelDefused = false;
+  defusedModulesCount = 0;
+  timeRemaining = lvl.timeLimit;
+  moduleStates = {};
+
+  updateStrikesDisplay();
+  updateTimerDisplay();
+
+  document.getElementById('hud-level-title').innerText = `LEVEL ${lvl.level}: ${lvl.title} [${lvl.difficulty}]`;
+
+  for (let i = 1; i <= 5; i++) {
+    const pill = document.getElementById(`pill-lvl-${i}`);
+    if (pill) pill.classList.toggle('current', i === lvl.level);
+  }
+
+  build3DBomb();
+  setCameraPreset('iso');
+
+  let lastTickSecond = Math.floor(timeRemaining);
+  timerInterval = setInterval(() => {
+    const speedMultiplier = strikes === 0 ? 1 : strikes === 1 ? 1.15 : 1.35;
+    timeRemaining -= (0.1 * speedMultiplier);
+
+    if (timeRemaining <= 0) {
+      timeRemaining = 0;
+      updateTimerDisplay();
+      clearInterval(timerInterval);
+      trigger3DExplosion();
+      return;
+    }
+
+    updateTimerDisplay();
+
+    const currentSec = Math.floor(timeRemaining);
+    if (currentSec !== lastTickSecond) {
+      lastTickSecond = currentSec;
+      audio.playTick(currentSec % 2 === 0);
+
+      if (strikes >= 2 || timeRemaining <= 45) {
+        audio.playHeartbeat();
+      }
+    }
+  }, 100);
+}
+
+function updateTimerDisplay() {
+  const mins = Math.floor(timeRemaining / 60);
+  const secs = Math.floor(timeRemaining % 60);
+  const tenths = Math.floor((timeRemaining % 1) * 10);
+  const formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${tenths}`;
+  const el = document.getElementById('timer-display');
+  el.innerText = formatted;
+
+  if (timeRemaining < 30) el.className = 'timer-digits critical';
+  else if (timeRemaining < 60) el.className = 'timer-digits warning';
+  else el.className = 'timer-digits';
+}
+
+function addStrike(reason = "Anti-tamper violation") {
+  if (levelDefused || isExploding) return;
+  strikes++;
+  audio.playBuzzer();
+  updateStrikesDisplay();
+
+  const stage = document.getElementById('viewport-stage');
+  stage.classList.add('screen-shake');
+  setTimeout(() => stage.classList.remove('screen-shake'), 600);
+
+  if (strikes >= 3) {
+    trigger3DExplosion();
+  }
+}
+
+function updateStrikesDisplay() {
+  for (let i = 1; i <= 3; i++) {
+    const led = document.getElementById(`strike-${i}`);
+    if (led) led.classList.toggle('active', i <= strikes);
+  }
+}
+
+function mark3DModuleDefused(modId, group) {
+  if (group.userData.defused) return;
+  group.userData.defused = true;
+  defusedModulesCount++;
+  audio.playDisarmedChime();
+
+  if (group.userData.statusLed) {
+    group.userData.statusLed.color.setHex(0x10b981);
+    group.userData.statusLed.emissive.setHex(0x10b981);
+    group.userData.statusLed.emissiveIntensity = 1.0;
+  }
+
+  checkLevelCompletion();
+}
+
+function checkLevelCompletion() {
+  const lvl = LEVELS[currentLevelIndex];
+  if (defusedModulesCount >= lvl.modules.length && !levelDefused) {
+    levelDefused = true;
+    clearInterval(timerInterval);
+    audio.playFanfare();
+
+    const pill = document.getElementById(`pill-lvl-${lvl.level}`);
+    if (pill) {
+      pill.classList.add('cleared');
+      pill.innerText = `LVL ${lvl.level} ✓`;
+    }
+
+    setTimeout(() => {
+      if (lvl.level === 5) {
+        document.getElementById('modal-campaign').style.display = 'flex';
+      } else {
+        const timeTaken = lvl.timeLimit - Math.floor(timeRemaining);
+        const m = Math.floor(timeTaken / 60);
+        const s = timeTaken % 60;
+        
+        // Prominently display "SUCCESSFUL!" message as requested by user
+        document.getElementById('victory-title').innerText = "SUCCESSFUL!";
+        if (lvl.level === 1) {
+          document.getElementById('victory-message').innerText = 
+            "SGT. VANCE: Outstanding work, Specialist! Level 1 Calibration Prototype neutralized with zero casualties! But stay sharp—the Syndicate has just activated heavier ordnance in Sector 2!";
+          document.getElementById('btn-next-level').innerText = "CONTINUE TO LEVEL 2 →";
+        } else {
+          document.getElementById('victory-message').innerText = 
+            `SGT. VANCE: Threat neutralized on Level ${lvl.level}! The sector is secured. Preparing coordinates for the next threat level!`;
+          document.getElementById('btn-next-level').innerText = `CONTINUE TO LEVEL ${lvl.level + 1} →`;
+        }
+
+        document.getElementById('stat-level').innerText = `Level ${lvl.level}: ${lvl.title}`;
+        document.getElementById('stat-time').innerText = `${m}m ${s}s (Remaining: ${Math.floor(timeRemaining)}s)`;
+        document.getElementById('stat-strikes').innerText = `${strikes} / 3`;
+        document.getElementById('modal-victory').style.display = 'flex';
+      }
+    }, 700);
+  }
+}
+
+/* ==========================================================================
+   CAMERA PRESETS & VIEW CONTROLS
+   ========================================================================== */
+function setCameraPreset(preset) {
+  if (!camera || !controls) return;
+  if (preset === 'top') {
+    camera.position.set(0, 19, 0.001);
+    controls.target.set(0, 0, 0);
+  } else if (preset === 'iso') {
+    camera.position.set(0, 16, 17);
+    controls.target.set(0, 0, 0);
+  } else if (preset === 'mod1') {
+    camera.position.set(-4.5, 9, 7);
+    controls.target.set(-4.5, 0, 0.8);
+  } else if (preset === 'mod2') {
+    camera.position.set(4.5, 9, 7);
+    controls.target.set(4.5, 0, 0.8);
+  } else if (preset === 'reset') {
+    camera.position.set(0, 16, 17);
+    controls.target.set(0, 0, 0);
+  }
+  controls.update();
+}
+
+/* ==========================================================================
+   FIELD MANUAL DRAWER & LEVEL SYNC CONTROLLER
+   ========================================================================== */
+let isManualOpen = false;
+
+function toggleManualDrawer() {
+  isManualOpen = !isManualOpen;
+  const drawer = document.getElementById('manual-drawer');
+  const btn = document.getElementById('btn-manual-toggle');
+  
+  if (isManualOpen) {
+    if (drawer) drawer.classList.add('open');
+    if (btn) {
+      btn.classList.add('active');
+      btn.innerText = '✕ CLOSE MANUAL';
+    }
+    syncManualTab(currentLevelIndex + 1);
+  } else {
+    if (drawer) drawer.classList.remove('open');
+    if (btn) {
+      btn.classList.remove('active');
+      btn.innerText = '📖 FIELD MANUAL';
+    }
+  }
+  setTimeout(onWindowResize, 60);
+}
+
+function syncManualTab(lvlNum) {
+  try {
+    const iframe = document.getElementById('manual-frame');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({ type: 'SET_CURRENT_LEVEL', level: lvlNum }, '*');
+    }
+  } catch (err) {
+    console.warn("Manual sync error:", err);
+  }
+}
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && isManualOpen) {
+    toggleManualDrawer();
+  }
+});
+
+/* ==========================================================================
+   LEVEL PROGRESSION & STRICT LOCKING (HIGHER LEVELS UNLOCKED ONLY ON WIN)
+   ========================================================================== */
+let highestUnlockedLevel = 1;
+
+function updateLevelPills() {
+  for (let i = 1; i <= 5; i++) {
+    const pill = document.getElementById('pill-lvl-' + i);
+    if (!pill) continue;
+    pill.classList.remove('current', 'cleared', 'locked');
+
+    if (i === currentLevelIndex + 1) {
+      pill.classList.add('current');
+      pill.innerText = 'LVL ' + i;
+      pill.style.opacity = '1';
+      pill.style.cursor = 'pointer';
+      pill.title = 'Current Level ' + i;
+    } else if (i <= highestUnlockedLevel) {
+      pill.innerText = 'LVL ' + i;
+      pill.style.opacity = '0.85';
+      pill.style.cursor = 'pointer';
+      pill.title = 'Play Level ' + i;
+    } else {
+      pill.classList.add('locked');
+      pill.innerText = '🔒 LVL ' + i;
+      pill.style.opacity = '0.4';
+      pill.style.cursor = 'not-allowed';
+      pill.title = 'Locked - Complete Level ' + (i - 1) + ' first';
+    }
+  }
+}
+
+function selectLevel(lvlNum) {
+  if (lvlNum > highestUnlockedLevel) {
+    audio.playBuzzer();
+    return;
+  }
+  document.getElementById('modal-victory').style.display = 'none';
+  document.getElementById('modal-defeat').style.display = 'none';
+  document.getElementById('modal-campaign').style.display = 'none';
+  initLevel(lvlNum - 1);
+}
+
+function restartCurrentLevel() {
+  document.getElementById('modal-victory').style.display = 'none';
+  document.getElementById('modal-defeat').style.display = 'none';
+  initLevel(currentLevelIndex);
+}
+
+function retryLevel() {
+  document.getElementById('modal-defeat').style.display = 'none';
+  initLevel(currentLevelIndex);
+}
+
+function nextLevel() {
+  document.getElementById('modal-victory').style.display = 'none';
+  if (currentLevelIndex < LEVELS.length - 1) {
+    highestUnlockedLevel = Math.max(highestUnlockedLevel, currentLevelIndex + 2);
+    updateLevelPills();
+    selectLevel(currentLevelIndex + 2);
+  }
+}
+
+function restartCampaign() {
+  document.getElementById('modal-campaign').style.display = 'none';
+  highestUnlockedLevel = 1;
+  updateLevelPills();
+  selectLevel(1);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  init3DScene();
+});
+</script>
+</body>
+</html>
